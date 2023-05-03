@@ -612,8 +612,6 @@ void renderScene()
 
 			color = rayTracing(ray, 1, 1.0).clamp();
 
-			color = scene->GetBackgroundColor(); //TO CHANGE - just for the template
-
 			img_Data[counter++] = u8fromfloat((float)color.r());
 			img_Data[counter++] = u8fromfloat((float)color.g());
 			img_Data[counter++] = u8fromfloat((float)color.b());
