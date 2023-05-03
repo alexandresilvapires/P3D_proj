@@ -460,7 +460,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	Object* hit = NULL;
 	Vector hitpoint = Vector(0,0,0);
 
-	float minDistance = ior_1 + 1;
+	float minDistance = 1000000; // TODO: Find max
 
 	//intersect ray with all objects and find a hit point (if any) closest to the start of the ray
 	for (int i = 0; i < nObjects; i++) {
@@ -541,7 +541,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 				Vector nInv = n;
 				nInv *= -1;
 
-				float snell = 1 / hit->GetMaterial()->GetRefrIndex(); //TODO: Get when we're inside a material and coming outside
+				float snell = ior_1 / hit->GetMaterial()->GetRefrIndex();
 
 				float sin_theta = snell * vt.length();
 				float cos_theta = sqrt(1 - pow(sin_theta,2));
