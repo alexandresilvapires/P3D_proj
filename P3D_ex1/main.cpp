@@ -459,6 +459,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	bool intersected = false;
 	Object* hit = NULL;
 	Vector hitpoint = Vector(0,0,0);
+	Vector currentHitpoint;
 
 	float minDistance = 1000000; // TODO: Find max
 
@@ -470,11 +471,12 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 
 		if (intersected) {
 			//Find hitpoints and pick object with shortest distance	
-			hitpoint = ray.origin + ray.direction * dist;
+			currentHitpoint = ray.origin + ray.direction * dist;
 
 			if (dist < minDistance) {
 				hit = o;
 				minDistance = dist;
+				hitpoint = currentHitpoint;
 			}
 		}
 	}
