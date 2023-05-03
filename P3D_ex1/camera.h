@@ -72,23 +72,15 @@ public:
 
 	Ray PrimaryRay(const Vector& pixel_sample) //  Rays cast from the Eye to a pixel sample which is in Viewport coordinates
 	{
-		Vector ray_dir;
+		float x_scalar = this->w * (pixel_sample.x / GetResX() - 0.5);
+		float y_scalar = this->h * (pixel_sample.y / GetResY() - 0.5);
+		float z_scalar = GetPlaneDist();
 
-		Vector pxy;
+		Vector ray_dir = Vector(this->u * x_scalar +
+			this->v * y_scalar -
+			this->n * z_scalar).normalize(); // Direction of the ray is normalised
 
-		float df = (eye-at).length();
-
-		Vector justx = Vector(pixel_sample.x, 0, 0);
-		Vector justy = Vector(0, pixel_sample.y, 0);
-		Vector justz = Vector(0, 0, pixel_sample.z);
-
-		Vector o = eye - justx.operator*=((w / 2)) - justy.operator*=((h / 2)) - justz.operator*=(df);
-
-		pxy = o + justx.operator*=(w * eye.x / GetResX()) + justy.operator*=(h * eye.y / GetResY());
-
-		ray_dir = (pxy - eye) / ((pxy - eye).length());
-
-		return Ray(eye, ray_dir);  
+		return Ray(eye, ray_dir);
 	}
 
 	Ray PrimaryRay(const Vector& lens_sample, const Vector& pixel_sample) // DOF: Rays cast from  a thin lens sample to a pixel sample

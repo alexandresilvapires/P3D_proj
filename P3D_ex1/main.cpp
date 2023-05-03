@@ -472,9 +472,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 			//Find hitpoints and pick object with shortest distance	
 			hitpoint = ray.origin + ray.direction * dist;
 
-			float distance = (hitpoint - ray.origin).length();
-
-			if (distance < minDistance) {
+			if (dist < minDistance) {
 				hit = o;
 				minDistance = distance;
 			}
@@ -511,7 +509,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 					}
 				}
 
-				if (pointInShadow) {
+				if (!pointInShadow) {
 					color = hit->GetMaterial()->GetDiffColor() + hit->GetMaterial()->GetSpecColor(); //Diffuse color + specular color
 				}
 			}
@@ -519,35 +517,31 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 			if (depth >= MAX_DEPTH) return color;
 
 			if (hit->GetMaterial()->GetReflection() > 0) {
-				Vector v = hitpoint - ray.origin;
-				Vector nScaled = normalAtHP;
-				nScaled *= 2 * (v * normalAtHP);
-				Vector newDir = nScaled - v;
-				Ray rRay = Ray(hitpoint, newDir);
+				Vector v_vector = ray.origin - hitpoint;
+				Vector ref_dir = (normalAtHP * (v_vector * normalAtHP) * 2 - v_vector).normalize();
+
+				Ray rRay = Ray(hitpoint, ref_dir);
+
 				Color rColor = rayTracing(rRay, depth + 1, ior_1);
 				color += rColor * hit->GetMaterial()->GetSpecular();
 			}
 
 			if (hit->GetMaterial()->GetRefrIndex() > 0) {
 
-				Vector v_hat = (ray.origin - hitpoint).normalize();
+				Vector v_hat = (hitpoint - ray.origin).normalize();
 
-				Vector vt = normalAtHP;
-				vt *= v_hat * normalAtHP;
-				vt = vt - v_hat;
+				Vector v_t = normalAtHP * (v_hat * normalAtHP) - v_hat;
 
-				Vector t_hat = vt;
-				t_hat *= (1 / vt.length());
-				Vector n = hit->getNormal(hitpoint);
-				Vector nInv = n;
-				nInv *= -1;
+				Vector t_hat = v_t.normalize();
+
+				Vector nInv = normalAtHP * (-1);
 
 				float snell = ior_1 / hit->GetMaterial()->GetRefrIndex();
 
-				float sin_theta = snell * vt.length();
-				float cos_theta = sqrt(1 - pow(sin_theta,2));
+				float sin_theta = snell * v_t.length();
+				float cos_theta = sqrt(1 - sin_theta * sin_theta);
 
-				Vector newDir = t_hat.operator*=(sin_theta) + nInv.operator*=(cos_theta);
+				Vector newDir = t_hat*sin_theta - normalAtHP*cos_theta;
 				Ray tRay = Ray(hitpoint, newDir);
 				Color tColor = rayTracing(tRay, depth + 1, hit->GetMaterial()->GetRefrIndex());
 				color += tColor * hit->GetMaterial()->GetTransmittance();
