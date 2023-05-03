@@ -474,7 +474,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 
 			if (dist < minDistance) {
 				hit = o;
-				minDistance = distance;
+				minDistance = dist;
 			}
 		}
 	}

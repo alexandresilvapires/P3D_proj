@@ -58,9 +58,6 @@
 \\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\color.h(42,14): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
 \\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\color.h(41,14): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
 \\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\color.h(40,28): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\main.cpp(477,27): error C2563: mismatch in formal parameter list
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\main.cpp(477,27): error C2568: '=': unable to resolve function overload
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\main.cpp(477,27): message : could be 'iterator_traits<_Iter>::difference_type std::distance(_InIt,_InIt)'
   scene.cpp
 \\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\maths.h(69,23): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
 \\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\camera.h(75,18): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
@@ -107,3 +104,6 @@
   vector.cpp
 \\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\vector.cpp(64,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
   Generating Code...
+  LINK : \\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\x64\Debug\P3D_ex1.exe not found or not built by the last incremental link; performing full link
+  P3D_ex1.vcxproj -> \\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\x64\Debug\P3D_ex1.exe
+  0 File(s) copied
