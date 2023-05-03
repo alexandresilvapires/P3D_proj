@@ -465,11 +465,12 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	//intersect ray with all objects and find a hit point (if any) closest to the start of the ray
 	for (int i = 0; i < nObjects; i++) {
 		Object* o = scene->getObject(i);
-		intersected = o->intercepts(ray, ior_1);
+		float dist = 0;
+		intersected = o->intercepts(ray, dist);
 
 		if (intersected) {
 			//Find hitpoints and pick object with shortest distance	
-			hitpoint = o->GetBoundingBox().interception(ray, ior_1); //TODO: fix using bounding box interception!
+			hitpoint = ray.origin + ray.direction * dist;
 
 			float distance = (hitpoint - ray.origin).length();
 
