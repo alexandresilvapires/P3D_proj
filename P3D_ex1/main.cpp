@@ -548,7 +548,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 
 				Vector newDir = t_hat.operator*=(sin_theta) + nInv.operator*=(cos_theta);
 				Ray tRay = Ray(hitpoint, newDir);
-				Color tColor = rayTracing(tRay, depth + 1, ior_1);
+				Color tColor = rayTracing(tRay, depth + 1, hit->GetMaterial()->GetRefrIndex());
 				color += tColor * hit->GetMaterial()->GetTransmittance();
 			}
 
