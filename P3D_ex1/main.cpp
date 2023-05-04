@@ -505,7 +505,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 				}
 			}
 
-			if (!point_in_shadow) { // phong lighting (excluding global illumination)
+			if (!point_in_shadow) { // phong shading (excluding global illumination)
 				color = closest_obj->GetMaterial()->GetDiffColor() + closest_obj->GetMaterial()->GetSpecColor(); // Diffuse color + specular color
 			}
 		}
@@ -532,12 +532,12 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		Vector v_t = normal_at_hp * (v_hat * normal_at_hp) - v_hat;
 
 		float sin_i = v_t.length();
-		float sin_t = ior_1 / closest_obj->GetMaterial()->GetRefrIndex() * sin_i;
+		float sin_t = (ior_1 / closest_obj->GetMaterial()->GetRefrIndex()) * sin_i;
 		float cos_t = sqrt(1 - sin_t * sin_t);
 
 		Vector t_hat = v_t.normalize();
 
-		Vector refr_dir = t_hat * sin_t + normal_at_hp * cos_t;
+		Vector refr_dir = t_hat * sin_t - normal_at_hp * cos_t;
 
 		Ray refr_ray = Ray(closest_hp, refr_dir);
 		Color refr_color = rayTracing(refr_ray, depth + 1, closest_obj->GetMaterial()->GetRefrIndex());
