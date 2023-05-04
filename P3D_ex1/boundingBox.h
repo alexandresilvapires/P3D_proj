@@ -15,7 +15,6 @@ public:
 	
 	bool isInside(const Vector& p);
 	bool intercepts(const Ray& r, float& t);
-	Vector interception(const Ray& r, float& t);
 	Vector centroid(void);
 	void extend(AABB box);
 
