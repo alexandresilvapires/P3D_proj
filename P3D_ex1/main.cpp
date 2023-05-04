@@ -455,134 +455,97 @@ void setupGLUT(int argc, char* argv[])
 
 Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medium 1 where the ray is travelling
 {
-	int nObjects = scene->getNumObjects();
+	// --- RAY CASTING PART ---
+	// intersect ray with all objects and find a hit point (if any) closest to the start of the ray
+
 	bool intersected = false;
-	Object* hit = NULL;
-	Vector hitpoint = Vector(0,0,0);
-	Vector currentHitpoint;
+	Object* closest_obj = NULL;
+	Vector closest_hp;
 
-	float minDistance = 1000000; // TODO: Find max
+	float min_dist = FLT_MAX;
+	int num_objs = scene->getNumObjects();
 
-	//intersect ray with all objects and find a hit point (if any) closest to the start of the ray
-	for (int i = 0; i < nObjects; i++) {
-		Object* o = scene->getObject(i);
+	for (int i = 0; i < num_objs; i++) {
+		Object* obj = scene->getObject(i);
 		float dist = 0;
-		intersected = o->intercepts(ray, dist);
+
+		intersected = obj->intercepts(ray, dist);
 
 		if (intersected) {
-			//Find hitpoints and pick object with shortest distance	
-			currentHitpoint = ray.origin + ray.direction * dist;
-
-			if (dist < minDistance) {
-				hit = o;
-				minDistance = dist;
-				hitpoint = currentHitpoint;
+			if (dist < min_dist) {
+				closest_obj = obj;
+				min_dist = dist;
+				closest_hp = ray.origin + ray.direction * dist;
 			}
 		}
 	}
 
-	if (!intersected) return scene->GetBackgroundColor();
-	else {
-		Color color = Color(0, 0, 0);
-		
-		Vector normalAtHP = hit->getNormal(hitpoint);
+	if (!intersected) return scene->GetBackgroundColor(); // Ray traveled to infinity and beyond
 
-		int nLights = scene->getNumLights();
+	Color color = Color();
+	int num_lights = scene->getNumLights();
+	Vector normal_at_hp = closest_obj->getNormal(closest_hp);
 
+	// Any objects between the intersection and direct light? If so, they're in the shadow.
+	for (int i = 0; i < num_lights; i++) {
+		Light* light = scene->getLight(i);
+		Vector light_dir = (light->position - closest_hp).normalize();
+		bool point_in_shadow = false;
 
-		for (int i = 0; i < nLights; i++) {
-			Light* light = scene->getLight(i);
+		if (light_dir * normal_at_hp > 0) {
+			Ray shadow_ray = Ray(closest_hp, light_dir);
 
-			Vector l = (light->position - hitpoint).normalize();
+			for (int i = 0; i < num_objs; i++) {
+				Object* obj = scene->getObject(i);
+				float dist = 0;
 
-			if (l * normalAtHP > 0) {
-
-				// Get any objects between hitpoint and light
-				Ray sRay = Ray(hitpoint, l);
-
-				bool pointInShadow = false;
-
-				for (int i = 0; i < nObjects; i++) {
-					Object* o = scene->getObject(i);
-					
-					if (o != hit && o->intercepts(sRay, ior_1)) {
-						pointInShadow = true;
-						break;
-					}
-				}
-
-				if (!pointInShadow) {
-					color = hit->GetMaterial()->GetDiffColor() + hit->GetMaterial()->GetSpecColor(); //Diffuse color + specular color
+				if (obj != closest_obj && obj->intercepts(shadow_ray, dist)) {
+					point_in_shadow = true;
+					break;
 				}
 			}
 
-			if (depth >= MAX_DEPTH) return color;
-
-			if (hit->GetMaterial()->GetReflection() > 0) {
-				Vector v_vector = ray.origin - hitpoint;
-				Vector ref_dir = (normalAtHP * (v_vector * normalAtHP) * 2 - v_vector).normalize();
-
-				Ray rRay = Ray(hitpoint, ref_dir);
-
-				Color rColor = rayTracing(rRay, depth + 1, ior_1);
-				color += rColor * hit->GetMaterial()->GetSpecular();
+			if (!point_in_shadow) { // phong lighting (excluding global illumination)
+				color = closest_obj->GetMaterial()->GetDiffColor() + closest_obj->GetMaterial()->GetSpecColor(); // Diffuse color + specular color
 			}
-
-			if (hit->GetMaterial()->GetRefrIndex() > 0) {
-
-				Vector v_hat = (hitpoint - ray.origin).normalize();
-
-				Vector v_t = normalAtHP * (v_hat * normalAtHP) - v_hat;
-
-				Vector t_hat = v_t.normalize();
-
-				Vector nInv = normalAtHP * (-1);
-
-				float snell = ior_1 / hit->GetMaterial()->GetRefrIndex();
-
-				float sin_theta = snell * v_t.length();
-				float cos_theta = sqrt(1 - sin_theta * sin_theta);
-
-				Vector newDir = t_hat*sin_theta - normalAtHP*cos_theta;
-				Ray tRay = Ray(hitpoint, newDir);
-				Color tColor = rayTracing(tRay, depth + 1, hit->GetMaterial()->GetRefrIndex());
-				color += tColor * hit->GetMaterial()->GetTransmittance();
-			}
-
-			return color;
 		}
-
 	}
 
-	/*
-	if (!intersection) return BACKGROUND;
-	else {
-		compute normal at the hit point;
-		for (each source light) {
-			L = unit light vector from hit point to light source;
-			if (L • normal>0)
-				if (!point in shadow); //trace shadow ray
-					color = diffuse color + specular color;
-			}
+	// ---	RAY CASTING PART FINISHED	---
+	// ---	---------------------------	---
+	// ---	TIME FOR PROPER PHYSICS		---
 
-			if (depth >= maxDepth) return color;
+	if (depth >= MAX_DEPTH) return color;
 
-			if (reflective object) {
-				rRay = calculate ray in the reflected direction;
-				rColor = rayTracing(scene, point, rRay direction, depth+1);
-				reduce rColor by the specular reflection coefficient and add to color; 
-			}
+	if (closest_obj->GetMaterial()->GetReflection() > 0) {
+		Vector v_vector = ray.origin - closest_hp; // IS THIS SUPPOSED TO BE NORMALISED?
+		Vector ref_dir = (normal_at_hp * (v_vector * normal_at_hp) * 2 - v_vector).normalize();
 
-			if (transparent object) {
-				tRay = calculate ray in the refracted direction;
-				tColor = rayTracing(scene, point, tRay direction, depth+1);
-				reduce tColor by the transmittance coefficient and add to color; 
-			}
-		return color;
+		Ray reflected_ray = Ray(closest_hp, ref_dir);
+
+		Color rColor = rayTracing(reflected_ray, depth + 1, ior_1);
+		color += rColor * closest_obj->GetMaterial()->GetSpecular();
 	}
-	*/
 
-	return Color(0.0f, 0.0f, 0.0f);
+	if (closest_obj->GetMaterial()->GetRefrIndex() > 0) {
+		Vector v_hat = (closest_hp - scene->GetCamera()->GetEye()).normalize();
+		Vector v_t = normal_at_hp * (v_hat * normal_at_hp) - v_hat;
+
+		float sin_i = v_t.length();
+		float sin_t = ior_1 / closest_obj->GetMaterial()->GetRefrIndex() * sin_i;
+		float cos_t = sqrt(1 - sin_t * sin_t);
+
+		Vector t_hat = v_t.normalize();
+
+		Vector refr_dir = t_hat * sin_t + normal_at_hp * cos_t;
+
+		Ray refr_ray = Ray(closest_hp, refr_dir);
+		Color refr_colour = rayTracing(refr_ray, depth + 1, closest_obj->GetMaterial()->GetRefrIndex());
+
+		color += refr_colour * closest_obj->GetMaterial()->GetTransmittance();
+	}
+
+	return color;
 }
 
 
