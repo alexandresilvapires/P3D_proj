@@ -1,7 +1,7 @@
  ///////////////////////////////////////////////////////////////////////
 //
 // P3D Course
-// (c) 2021 by João Madeiras Pereira
+// (c) 2021 by JoÃ£o Madeiras Pereira
 //Ray Tracing P3F scenes and drawing points with Modern OpenGL
 //
 ///////////////////////////////////////////////////////////////////////
@@ -184,8 +184,8 @@ void createBufferObjects()
 	glGenBuffers(2, VboId);
 	glBindBuffer(GL_ARRAY_BUFFER, VboId[0]);
 
-	/* Só se faz a alocação dos arrays glBufferData (NULL), e o envio dos pontos para a placa gráfica
-	é feito na drawPoints com GlBufferSubData em tempo de execução pois os arrays são GL_DYNAMIC_DRAW */
+	/* SÃ³ se faz a alocaÃ§Ã£o dos arrays glBufferData (NULL), e o envio dos pontos para a placa grÃ¡fica
+	Ã© feito na drawPoints com GlBufferSubData em tempo de execuÃ§Ã£o pois os arrays sÃ£o GL_DYNAMIC_DRAW */
 	glBufferData(GL_ARRAY_BUFFER, size_vertices, NULL, GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(VERTEX_COORD_ATTRIB);
 	glVertexAttribPointer(VERTEX_COORD_ATTRIB, 2, GL_FLOAT, 0, 0, 0);
@@ -523,8 +523,8 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 
 		Ray reflected_ray = Ray(closest_hp, ref_dir);
 
-		Color rColor = rayTracing(reflected_ray, depth + 1, ior_1);
-		color += rColor * closest_obj->GetMaterial()->GetSpecular();
+		Color refl_color = rayTracing(reflected_ray, depth + 1, ior_1);
+		color += refl_color * closest_obj->GetMaterial()->GetSpecular();
 	}
 
 	if (closest_obj->GetMaterial()->GetRefrIndex() > 0) {
@@ -540,9 +540,9 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		Vector refr_dir = t_hat * sin_t + normal_at_hp * cos_t;
 
 		Ray refr_ray = Ray(closest_hp, refr_dir);
-		Color refr_colour = rayTracing(refr_ray, depth + 1, closest_obj->GetMaterial()->GetRefrIndex());
+		Color refr_color = rayTracing(refr_ray, depth + 1, closest_obj->GetMaterial()->GetRefrIndex());
 
-		color += refr_colour * closest_obj->GetMaterial()->GetTransmittance();
+		color += refr_color * closest_obj->GetMaterial()->GetTransmittance();
 	}
 
 	return color;
