@@ -40,8 +40,50 @@ Vector Triangle::getNormal(Vector point)
 
 bool Triangle::intercepts(Ray& r, float& t ) {
 
-	//PUT HERE YOUR CODE
-	return (false);
+	// Adapted from https://scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/ray-triangle-intersection-geometric-solution.html 
+
+	// Start by computing the plane's normal to see where it intersects the plane
+	Vector p0p1 = points[1] - points[0];
+	Vector p0p2 = points[2] - points[0];
+
+	Vector N = p0p1.operator%(p0p2); // N
+
+	// Check if ray and plane are (almost) parallel. If so, they don't intersept
+	float parallel_check = N.operator*(r.direction);
+	if (fabs(parallel_check) < 0.00001) return false; // TODO: Define threshold
+
+	// Calculate distance to origin
+	float d = -N.operator*(points[0]);
+
+	// Calculate t for intersection point
+	t = -(N.operator*(r.origin) + d) / parallel_check;
+
+	// If the point is behind the triangle (negative distance needed to hit) no intersection
+	if (t < 0) return false; // the triangle is behind
+
+	// Compute the intersection point for inside-outside testing
+	Vector intersect_point = r.origin + r.direction * t;
+	Vector vector_check; // vector perpendicular to triangle's plane
+
+	// edge 0
+	Vector edge0 = p0p1;
+	Vector vp0 = intersect_point - points[0];
+	vector_check = edge0.operator%(vp0);
+	if (N.operator*(vector_check) < 0) return false; // P is on the right side
+
+	// edge 1
+	Vector edge1 = points[2] - points[1];
+	Vector vp1 = intersect_point - points[1];
+	vector_check = edge1.operator%(vp1);
+	if (N.operator*(vector_check) < 0)  return false; // P is on the right side
+
+	// edge 2
+	Vector edge2 = points[0] - points[2];
+	Vector vp2 = intersect_point - points[2];
+	vector_check = edge2.operator%(vp2);
+	if (N.operator*(vector_check) < 0) return false; // P is on the right side;
+
+	return true; // this ray hits the triangle
 }
 
 Plane::Plane(Vector& a_PN, float a_D)
