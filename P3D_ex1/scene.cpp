@@ -50,20 +50,21 @@ Plane::Plane(Vector& a_PN, float a_D)
 
 Plane::Plane(Vector& P0, Vector& P1, Vector& P2)
 {
-   float l;
+   Vector AB = P1 - P0;
+   Vector AC = P2 - P0;
 
    //Calculate the normal plane: counter-clockwise vectorial product.
-   PN = Vector(0, 0, 0);		
+   PN = AB % AC;
 
-   if ((l=PN.length()) == 0.0)
+   if (PN.length() == 0.0)
    {
      cerr << "DEGENERATED PLANE!\n";
    }
    else
    {
-     PN.normalize();
+     PN = PN.normalize();
 	 //Calculate D
-     D  = 0.0f;
+     D  = -(PN * P0); // 
    }
 }
 
@@ -73,8 +74,17 @@ Plane::Plane(Vector& P0, Vector& P1, Vector& P2)
 
 bool Plane::intercepts( Ray& r, float& t )
 {
-	//PUT HERE YOUR CODE
-   return (false);
+	float norm_dir_dp = this->PN * r.direction;
+	if (norm_dir_dp == 0) { // plane and ray are parallel
+		return false;
+	}
+	
+	float t_intersect = -(r.origin * this->PN - D) / norm_dir_dp;
+
+	if (t_intersect < 0) return false; // plane is behind the origin 
+
+	t = t_intersect;
+	return true;
 }
 
 Vector Plane::getNormal(Vector point) 
@@ -98,7 +108,7 @@ Vector Sphere::getNormal( Vector point )
 
 AABB Sphere::GetBoundingBox() {
 	Vector a_min;
-	Vector a_max ;
+	Vector a_max;
 
 	//PUT HERE YOUR CODE
 	return(AABB(a_min, a_max));
@@ -117,6 +127,7 @@ AABB aaBox::GetBoundingBox() {
 bool aaBox::intercepts(Ray& ray, float& t)
 {
 	//PUT HERE YOUR CODE
+	// ALWAYS USE EPSILON (already defined) IN THE DIRECTION OF THE NORMAL
 		return (false);
 }
 

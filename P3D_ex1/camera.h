@@ -78,7 +78,7 @@ public:
 
 		Vector ray_dir = Vector(this->u * x_scalar +
 								this->v * y_scalar -
-								this->n * z_scalar).normalize(); // Direction of the ray is normalised
+								this->n * z_scalar).normalize(); // Direction of the ray is normalised; also -n because df is in the -zs, always.
 
 		return Ray(eye, ray_dir);
 	}

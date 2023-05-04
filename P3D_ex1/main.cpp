@@ -517,9 +517,14 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 
 	if (depth >= MAX_DEPTH) return color;
 
+	Vector normal_to_use = normal_at_hp;
+	if (normal_at_hp * ray.direction < 0) {
+		normal_to_use = normal_at_hp * (-1); // if dot is negative, that means that we are inside the object -> let's use the symmetric normal.
+	}
+
 	if (closest_obj->GetMaterial()->GetReflection() > 0) {
-		Vector v_vector = ray.origin - closest_hp; // IS THIS SUPPOSED TO BE NORMALISED?
-		Vector ref_dir = (normal_at_hp * (v_vector * normal_at_hp) * 2 - v_vector).normalize();
+		Vector v_vector = ray.origin - closest_hp;
+		Vector ref_dir = (normal_to_use * (v_vector * normal_to_use) * 2 - v_vector).normalize();
 
 		Ray reflected_ray = Ray(closest_hp, ref_dir);
 
@@ -529,7 +534,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 
 	if (closest_obj->GetMaterial()->GetRefrIndex() > 0) {
 		Vector v_hat = (closest_hp - scene->GetCamera()->GetEye()).normalize();
-		Vector v_t = normal_at_hp * (v_hat * normal_at_hp) - v_hat;
+		Vector v_t = normal_to_use * (v_hat * normal_to_use) - v_hat;
 
 		float sin_i = v_t.length();
 		float sin_t = (ior_1 / closest_obj->GetMaterial()->GetRefrIndex()) * sin_i;
@@ -537,7 +542,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 
 		Vector t_hat = v_t.normalize();
 
-		Vector refr_dir = t_hat * sin_t - normal_at_hp * cos_t;
+		Vector refr_dir = t_hat * sin_t - normal_to_use * cos_t;
 
 		Ray refr_ray = Ray(closest_hp, refr_dir);
 		Color refr_color = rayTracing(refr_ray, depth + 1, closest_obj->GetMaterial()->GetRefrIndex());

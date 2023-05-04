@@ -1,109 +1,97 @@
-﻿  boundingBox.cpp
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\boundingBox.cpp(85,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\boundingBox.cpp(95,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\boundingBox.cpp(105,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\boundingBox.cpp(121,10): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\boundingBox.cpp(147,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\boundingBox.cpp(157,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\boundingBox.cpp(167,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\boundingBox.cpp(183,10): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-  bvh.cpp
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\maths.h(69,23): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\camera.h(75,18): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\camera.h(76,18): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\color.h(42,14): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\color.h(41,14): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\color.h(40,28): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\bvh.cpp(25,49): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\bvh.cpp(45,43): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\bvh.cpp(60,10): warning C4101: 'tmp': unreferenced local variable
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\bvh.cpp(72,10): warning C4101: 'tmp': unreferenced local variable
+﻿  bvh.cpp
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\maths.h(69,23): warning C4244: 'return' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\camera.h(75,18): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\camera.h(76,18): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\color.h(42,14): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\color.h(41,14): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\color.h(40,28): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\bvh.cpp(25,49): warning C4267: 'return' : conversion de 'size_t' en 'int', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\bvh.cpp(45,43): warning C4267: 'argument' : conversion de 'size_t' en 'int', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\bvh.cpp(60,10): warning C4101: 'tmp' : variable locale non référencée
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\bvh.cpp(72,10): warning C4101: 'tmp' : variable locale non référencée
   grid.cpp
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\maths.h(69,23): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\camera.h(75,18): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\camera.h(76,18): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\color.h(42,14): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\color.h(41,14): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\color.h(40,28): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\grid.cpp(9,23): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\grid.cpp(63,18): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\grid.cpp(64,18): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\grid.cpp(65,18): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\grid.cpp(80,13): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\grid.cpp(81,13): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\grid.cpp(82,13): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\grid.cpp(83,13): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\grid.cpp(84,13): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\grid.cpp(85,13): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\grid.cpp(32,6): warning C4101: 'xmin': unreferenced local variable
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\grid.cpp(33,12): warning C4101: 'ymax': unreferenced local variable
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\grid.cpp(34,12): warning C4101: 'zmax': unreferenced local variable
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\grid.cpp(35,6): warning C4101: 'index': unreferenced local variable
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\grid.cpp(33,6): warning C4101: 'ymin': unreferenced local variable
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\grid.cpp(32,12): warning C4101: 'xmax': unreferenced local variable
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\grid.cpp(34,6): warning C4101: 'zmin': unreferenced local variable
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\grid.cpp(124,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\grid.cpp(134,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\grid.cpp(144,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\grid.cpp(177,13): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\grid.cpp(178,13): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\grid.cpp(179,13): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\grid.cpp(183,13): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\grid.cpp(184,13): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\grid.cpp(185,13): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\maths.h(69,23): warning C4244: 'return' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\camera.h(75,18): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\camera.h(76,18): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\color.h(42,14): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\color.h(41,14): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\color.h(40,28): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\grid.cpp(9,23): warning C4267: 'return' : conversion de 'size_t' en 'int', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\grid.cpp(63,18): warning C4244: '=' : conversion de 'double' en 'int', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\grid.cpp(64,18): warning C4244: '=' : conversion de 'double' en 'int', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\grid.cpp(65,18): warning C4244: '=' : conversion de 'double' en 'int', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\grid.cpp(80,13): warning C4244: 'initialisation' : conversion de 'double' en 'int', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\grid.cpp(81,13): warning C4244: 'initialisation' : conversion de 'double' en 'int', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\grid.cpp(82,13): warning C4244: 'initialisation' : conversion de 'double' en 'int', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\grid.cpp(83,13): warning C4244: 'initialisation' : conversion de 'double' en 'int', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\grid.cpp(84,13): warning C4244: 'initialisation' : conversion de 'double' en 'int', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\grid.cpp(85,13): warning C4244: 'initialisation' : conversion de 'double' en 'int', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\grid.cpp(32,6): warning C4101: 'xmin' : variable locale non référencée
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\grid.cpp(33,12): warning C4101: 'ymax' : variable locale non référencée
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\grid.cpp(34,12): warning C4101: 'zmax' : variable locale non référencée
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\grid.cpp(35,6): warning C4101: 'index' : variable locale non référencée
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\grid.cpp(33,6): warning C4101: 'ymin' : variable locale non référencée
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\grid.cpp(32,12): warning C4101: 'xmax' : variable locale non référencée
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\grid.cpp(34,6): warning C4101: 'zmin' : variable locale non référencée
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\grid.cpp(124,10): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\grid.cpp(134,10): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\grid.cpp(144,10): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\grid.cpp(177,13): warning C4244: '=' : conversion de 'double' en 'int', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\grid.cpp(178,13): warning C4244: '=' : conversion de 'double' en 'int', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\grid.cpp(179,13): warning C4244: '=' : conversion de 'double' en 'int', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\grid.cpp(183,13): warning C4244: '=' : conversion de 'double' en 'int', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\grid.cpp(184,13): warning C4244: '=' : conversion de 'double' en 'int', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\grid.cpp(185,13): warning C4244: '=' : conversion de 'double' en 'int', perte possible de données
   main.cpp
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\maths.h(69,23): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\camera.h(75,18): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\camera.h(76,18): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\color.h(42,14): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\color.h(41,14): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\color.h(40,28): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\maths.h(69,23): warning C4244: 'return' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\camera.h(75,18): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\camera.h(76,18): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\color.h(42,14): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\color.h(41,14): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\color.h(40,28): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
   scene.cpp
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\maths.h(69,23): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\camera.h(75,18): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\camera.h(76,18): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\color.h(42,14): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\color.h(41,14): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\color.h(40,28): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(143,23): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(163,22): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(291,23): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(292,23): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(231,8): warning C4101: 't_intersec': unreferenced local variable
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(357,56): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(357,53): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(357,46): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(357,42): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(357,34): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(411,23): warning C4018: '<': signed/unsigned mismatch
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(415,23): warning C4018: '<': signed/unsigned mismatch
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(488,56): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(529,40): warning C4244: 'argument': conversion from 'time_t' to 'const int', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(533,46): warning C4305: 'argument': truncation from 'double' to 'float'
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(539,59): warning C4305: 'argument': truncation from 'double' to 'float'
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(539,145): warning C4305: 'argument': truncation from 'double' to 'float'
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(558,59): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(558,80): warning C4305: 'argument': truncation from 'double' to 'float'
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(558,29): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(560): warning C4305: 'argument': truncation from 'double' to 'float'
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(562,77): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(562,62): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(562,47): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(563,38): warning C4305: 'argument': truncation from 'double' to 'float'
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(568,116): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(568,95): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(568,74): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(569,38): warning C4305: 'argument': truncation from 'double' to 'float'
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(574,95): warning C4305: 'argument': truncation from 'double' to 'float'
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(575,38): warning C4305: 'argument': truncation from 'double' to 'float'
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(584,91): warning C4305: 'argument': truncation from 'double' to 'float'
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(589,45): warning C4305: 'argument': truncation from 'double' to 'float'
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(589,91): warning C4305: 'argument': truncation from 'double' to 'float'
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(594,45): warning C4305: 'argument': truncation from 'double' to 'float'
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\scene.cpp(594,72): warning C4305: 'argument': truncation from 'double' to 'float'
-  vector.cpp
-\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\P3D_ex1\vector.cpp(64,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-  Generating Code...
-  LINK : \\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\x64\Debug\P3D_ex1.exe not found or not built by the last incremental link; performing full link
-  P3D_ex1.vcxproj -> \\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\x64\Debug\P3D_ex1.exe
-  0 File(s) copied
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\maths.h(69,23): warning C4244: 'return' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\camera.h(75,18): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\camera.h(76,18): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\color.h(42,14): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\color.h(41,14): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\color.h(40,28): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(156,23): warning C4267: 'return' : conversion de 'size_t' en 'int', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(176,22): warning C4267: 'return' : conversion de 'size_t' en 'int', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(304,23): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(305,23): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(244,8): warning C4101: 't_intersec' : variable locale non référencée
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(370,56): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(370,53): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(370,46): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(370,42): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(370,34): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(424,23): warning C4018: '<' : incompatibilité signed/unsigned
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(428,23): warning C4018: '<' : incompatibilité signed/unsigned
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(501,56): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(542,40): warning C4244: 'argument' : conversion de 'time_t' en 'const int', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(546,46): warning C4305: 'argument' : troncation de 'double' à 'float'
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(552,59): warning C4305: 'argument' : troncation de 'double' à 'float'
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(552,145): warning C4305: 'argument' : troncation de 'double' à 'float'
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(571,59): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(571,80): warning C4305: 'argument' : troncation de 'double' à 'float'
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(571,29): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(573): warning C4305: 'argument' : troncation de 'double' à 'float'
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(575,77): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(575,62): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(575,47): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(576,38): warning C4305: 'argument' : troncation de 'double' à 'float'
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(581,116): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(581,95): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(581,74): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(582,38): warning C4305: 'argument' : troncation de 'double' à 'float'
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(587,95): warning C4305: 'argument' : troncation de 'double' à 'float'
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(588,38): warning C4305: 'argument' : troncation de 'double' à 'float'
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(597,91): warning C4305: 'argument' : troncation de 'double' à 'float'
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(602,45): warning C4305: 'argument' : troncation de 'double' à 'float'
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(602,91): warning C4305: 'argument' : troncation de 'double' à 'float'
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(607,45): warning C4305: 'argument' : troncation de 'double' à 'float'
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(607,72): warning C4305: 'argument' : troncation de 'double' à 'float'
+  Génération de code en cours...
+  P3D_ex1.vcxproj -> C:\Users\jfons\Documents\P3D_proj\x64\Debug\P3D_ex1.exe
+  0 fichier(s) copiÚ(s)
