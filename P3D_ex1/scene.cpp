@@ -149,8 +149,32 @@ Vector Plane::getNormal(Vector point)
 
 bool Sphere::intercepts(Ray& r, float& t )
 {
-	//PUT HERE YOUR CODE
-  return (false);
+	Vector oc = this->center - r.direction;
+
+	// b = d * OC
+	float b = r.direction * oc;
+
+	// c = OC.OC - r^2
+	float c = oc * oc - this->radius * this->radius;
+
+	// if ray outside
+	if (c > 0){
+		if (b <= 0)
+			return (false);
+	}
+
+	// if discriminant is negative
+	float discriminant = b * b - c;
+	if (discriminant <= 0)
+		return (false);
+
+	// if origin outside
+	if (std::pow(this->center.x - r.origin.x, 2) + std::pow(this->center.y - r.origin.y, 2) + std::pow(this->center.z - r.origin.z, 2) > std::pow(this->radius, 2))
+		t = b - std::sqrt(discriminant);
+	else
+		t = b + std::sqrt(discriminant);
+
+	return (true);
 }
 
 
