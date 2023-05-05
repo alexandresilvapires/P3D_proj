@@ -16,8 +16,20 @@ Triangle::Triangle(Vector& P0, Vector& P1, Vector& P2)
 	normal.normalize();
 
 	//YOUR CODE to Calculate the Min and Max for bounding box
-	Min = Vector(+FLT_MAX, +FLT_MAX, +FLT_MAX);
-	Max = Vector(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+	double max_x = -FLT_MAX, max_y = -FLT_MAX, max_z = -FLT_MAX;
+	double min_x = FLT_MAX, min_y = FLT_MAX, min_z = FLT_MAX;
+	for (Vector p : points) {
+		if (p.x > max_x) max_x = p.x;
+		if (p.y > max_y) max_y = p.y;
+		if (p.z > max_z) max_z = p.z;
+
+		if (p.x < min_x) min_x = p.x;
+		if (p.y < min_y) min_y = p.y;
+		if (p.z < min_z) min_z = p.z;
+	}
+
+	Min = Vector(min_x, min_y, min_z);
+	Max = Vector(max_x, max_y, max_z);
 
 
 	// enlarge the bounding box a bit just in case...
@@ -48,7 +60,7 @@ bool Triangle::intercepts(Ray& r, float& t ) {
 
 	Vector N = p0p1.operator%(p0p2); // N
 
-	// Check if ray and plane are (almost) parallel. If so, they don't intersept
+	// Check if ray and plane are (almost) parallel. If so, they don't intercept
 	float parallel_check = N.operator*(r.direction);
 	if (fabs(parallel_check) < 0.00001) return false; // TODO: Define threshold
 
@@ -168,9 +180,84 @@ AABB aaBox::GetBoundingBox() {
 
 bool aaBox::intercepts(Ray& ray, float& t)
 {
-	//PUT HERE YOUR CODE
-	// ALWAYS USE EPSILON (already defined) IN THE DIRECTION OF THE NORMAL
-		return (false);
+	//TODO?: ALWAYS USE EPSILON (already defined) IN THE DIRECTION OF THE NORMAL
+	double ox = ray.origin.x; double oy = ray.origin.y; double oz = ray.origin.z;
+	double dx = ray.direction.x; double dy = ray.direction.y; double dz = ray.direction.z;
+
+	double tx_min, ty_min, tz_min;
+	double tx_max, ty_max, tz_max;
+
+	double a = 1.0 / dx;
+	if(a >= 0){
+		tx_min = (this->min.x - ox) * a;
+		tx_max = (this->max.x - ox) * a;
+	}
+	else {
+		tx_min = (this->max.x - ox) * a;
+		tx_max = (this->min.x - ox) * a;
+	}
+
+	double b = 1.0 / dy;
+	if (b >= 0) {
+		ty_min = (this->min.y - oy) * b;
+		ty_max = (this->max.y - oy) * b;
+	}
+	else {
+		ty_min = (this->max.y - oy) * b;
+		ty_max = (this->min.y - oy) * b;
+	}
+
+	double c = 1.0 / dz;
+	if (c >= 0) {
+		tz_min = (this->min.z - oz) * c;
+		tz_max = (this->max.z - oz) * c;
+	}
+	else {
+		tz_min = (this->max.z - oz) * c;
+		tz_max = (this->min.z - oz) * c;
+	}
+
+	float tE, tL; //entering and leaving t values 
+	Vector face_in, face_out; // normals
+
+	// find largest tE, entering t value
+	if (tx_min > ty_min) {
+		tE = tx_min;
+		face_in = (a >= 0.0) ? Vector(-1, 0, 0) : Vector(1, 0, 0);
+	}
+	else {
+		tE = ty_min;
+		face_in = (b >= 0.0) ? Vector(0, -1, 0) : Vector(0, 1, 0);
+	}
+	if (tz_min > tE) {
+		tE = tz_min;
+		face_in = (c >= 0.0) ? Vector(0, 0, -1) : Vector(0, 0, 1);
+	}
+	// find smallest tL, leaving t value
+	if (tx_max < ty_max) {
+		tL = tx_max;
+		face_out = (a >= 0.0) ? Vector(1, 0, 0) : Vector(-1, 0, 0);
+	}
+	else {
+		tL = ty_max;
+		face_out = (b >= 0.0) ? Vector(0, 1, 0) : Vector(0, -1, 0);
+	}
+	if (tz_max < tL) {
+		tL = tz_max;
+		face_out = (c >= 0.0) ? Vector(0, 0, 1) : Vector(0, 0, -1);
+	}
+	if (tE < tL && tL > 0) { // condition for a hit
+		if (tE > 0) {
+			t = tE; // ray hits outside surface
+			Normal = face_in;
+		}
+		else {
+			t = tL; // ray hits inside surface
+			Normal = face_out;
+		}
+		return (true);
+	}
+	return (false);
 }
 
 Vector aaBox::getNormal(Vector point)
