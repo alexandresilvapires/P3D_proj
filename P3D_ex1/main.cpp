@@ -25,7 +25,7 @@
 #include "macros.h"
 
 //Enable OpenGL drawing.  
-bool drawModeEnabled = true;
+bool drawModeEnabled = false;
 
 bool P3F_scene = true; //choose between P3F scene or a built-in random scene
 
@@ -453,11 +453,18 @@ void setupGLUT(int argc, char* argv[])
 
 /////////////////////////////////////////////////////YOUR CODE HERE///////////////////////////////////////////////////////////////////////////////////////
 
+float fresnel(float ior_1, float ior_2, Vector dir, Vector normal) {
+	float ro = pow(((ior_1 - ior_2) / (ior_1 + ior_2)), 2);
+
+	float cos = dir * normal; // cos 0 = v1 . v2 / (|v1| + |v2|) but dir and normal are normalized
+
+	return ro + (1 - ro) * pow((1 - cos), 5);
+}
+
 Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medium 1 where the ray is travelling
 {
 	// --- RAY CASTING PART ---
 	// intersect ray with all objects and find a hit point (if any) closest to the start of the ray
-
 	bool intersected = false;
 	Object* closest_obj = nullptr;
 	Vector closest_hp;
@@ -492,7 +499,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		bool point_in_shadow = false;
 
 		if (light_dir * normal_at_hp > 0) {
-			Ray shadow_ray = Ray(closest_hp, light_dir);
+			Ray shadow_ray = Ray(closest_hp+normal_at_hp*(0.0001f), light_dir);
 
 			for (int i = 0; i < num_objs; i++) {
 				Object* obj = scene->getObject(i);
@@ -505,7 +512,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 			}
 
 			if (!point_in_shadow) { // phong shading (excluding global illumination)
-				color = closest_obj->GetMaterial()->GetDiffColor() + closest_obj->GetMaterial()->GetSpecColor(); // Diffuse color + specular color
+				color = closest_obj->GetMaterial()->GetDiffColor() % closest_obj->GetMaterial()->GetSpecColor(); // Diffuse color + specular color
 			}
 		}
 	}
@@ -514,21 +521,27 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	// ---	---------------------------	---
 	// ---	TIME FOR PROPER PHYSICS		---
 
-	if (depth >= MAX_DEPTH) return color;
+	if (depth >= MAX_DEPTH) {
+		return color;
+	}
+
+	// Calculate fresnel
+	float kr = fresnel(ior_1, closest_obj->GetMaterial()->GetRefrIndex(), ray.direction, normal_at_hp);
 
 	Vector normal_to_use = normal_at_hp;
 	if (normal_at_hp * ray.direction < 0) {
 		normal_to_use = normal_at_hp * (-1); // if dot is negative, that means that we are inside the object -> let's use the symmetric normal.
 	}
 
+
 	if (closest_obj->GetMaterial()->GetReflection() > 0) {
 		Vector v_vector = ray.origin - closest_hp;
 		Vector ref_dir = (normal_to_use * (v_vector * normal_to_use) * 2 - v_vector).normalize();
 
-		Ray reflected_ray = Ray(closest_hp, ref_dir);
+		Ray reflected_ray = Ray(closest_hp + ray.direction * (0.0001f), ref_dir);
 
 		Color refl_color = rayTracing(reflected_ray, depth + 1, ior_1);
-		color += refl_color * closest_obj->GetMaterial()->GetSpecular();
+		color %= refl_color * closest_obj->GetMaterial()->GetSpecular() * kr;
 	}
 
 	if (closest_obj->GetMaterial()->GetRefrIndex() > 0) {
@@ -543,12 +556,11 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 
 		Vector refr_dir = t_hat * sin_t - normal_to_use * cos_t;
 
-		Ray refr_ray = Ray(closest_hp, refr_dir);
+		Ray refr_ray = Ray(closest_hp + ray.direction*(0.00001f), refr_dir);
 		Color refr_color = rayTracing(refr_ray, depth + 1, closest_obj->GetMaterial()->GetRefrIndex());
 
-		color += refr_color * closest_obj->GetMaterial()->GetTransmittance();
+		color %= refr_color * closest_obj->GetMaterial()->GetTransmittance() * (1 - kr);
 	}
-
 	return color;
 }
 
