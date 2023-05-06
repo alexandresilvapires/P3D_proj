@@ -150,39 +150,36 @@ Vector Plane::getNormal(Vector point)
 
 bool Sphere::intercepts(Ray& r, float& t )
 {
-	Vector oc = this->center - r.direction;
+	Vector oc = this->center - r.origin;
 
 	// b = d * OC
 	float b = r.direction * oc;
 
 	// c = OC.OC - r^2
-	float c = oc * oc - this->radius * this->radius;
+	float c = (oc * oc) - (this->radius * this->radius);
 
 	// if ray outside
-	if (c > 0){
-		if (b <= 0)
-			return (false);
-	}
+	if (c > 0 && b <= 0) return false;
 
-	// if discriminant is negative
 	float discriminant = b * b - c;
-	if (discriminant <= 0)
-		return (false);
+	// if discriminant is negative
+	if (discriminant <= 0) return false;
 
 	// if origin outside
-	if (std::pow(this->center.x - r.origin.x, 2) + std::pow(this->center.y - r.origin.y, 2) + std::pow(this->center.z - r.origin.z, 2) > std::pow(this->radius, 2))
+	if (c > 0) {
 		t = b - std::sqrt(discriminant);
-	else
+	}
+	else {
 		t = b + std::sqrt(discriminant);
+	}
 
-	return (true);
+	return true;
 }
 
 
 Vector Sphere::getNormal( Vector point )
 {
-	Vector normal = point - center;
-	return (normal.normalize());
+	return (point - center).normalize();
 }
 
 AABB Sphere::GetBoundingBox() {
