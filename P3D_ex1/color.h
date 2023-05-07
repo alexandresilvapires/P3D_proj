@@ -60,6 +60,15 @@ public:
   Color		operator *=	(Color c)
 				{ R*=c.R; G*=c.G; B*=c.B; return *this; }
 
+  Color		operator %=	(Color c){
+	  R = std::max(c.R,R); G = std::max(c.G,G); B = std::max(c.B,B); return *this;
+  }
+ 
+  Color		operator %	(Color c) {
+	  return Color(std::max(c.R, R), std::max(c.G, G), std::max(c.B, B));
+  }
+
+
    friend inline
   istream&	operator >>	(istream& s, Color& c)
 	{ return s >> c.R >> c.G >> c.B; }
