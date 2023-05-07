@@ -1,57 +1,11 @@
-﻿  scene.cpp
+﻿  main.cpp
 C:\Users\jfons\Documents\P3D_proj\P3D_ex1\maths.h(69,23): warning C4244: 'return' : conversion de 'double' en 'float', perte possible de données
 C:\Users\jfons\Documents\P3D_proj\P3D_ex1\camera.h(75,18): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
 C:\Users\jfons\Documents\P3D_proj\P3D_ex1\camera.h(76,18): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
 C:\Users\jfons\Documents\P3D_proj\P3D_ex1\color.h(42,14): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
 C:\Users\jfons\Documents\P3D_proj\P3D_ex1\color.h(41,14): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
 C:\Users\jfons\Documents\P3D_proj\P3D_ex1\color.h(40,28): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(32,29): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(32,22): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(32,15): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(33,29): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(33,22): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(33,15): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(247,8): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(251,8): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(255,8): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(260,8): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(264,8): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(268,8): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(305,23): warning C4267: 'return' : conversion de 'size_t' en 'int', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(325,22): warning C4267: 'return' : conversion de 'size_t' en 'int', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(453,23): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(454,23): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(393,8): warning C4101: 't_intersec' : variable locale non référencée
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(519,56): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(519,53): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(519,46): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(519,42): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(519,34): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(573,23): warning C4018: '<' : incompatibilité signed/unsigned
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(577,23): warning C4018: '<' : incompatibilité signed/unsigned
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(650,56): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(691,40): warning C4244: 'argument' : conversion de 'time_t' en 'const int', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(695,46): warning C4305: 'argument' : troncation de 'double' à 'float'
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(701,59): warning C4305: 'argument' : troncation de 'double' à 'float'
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(701,145): warning C4305: 'argument' : troncation de 'double' à 'float'
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(720,59): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(720,80): warning C4305: 'argument' : troncation de 'double' à 'float'
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(720,29): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(722): warning C4305: 'argument' : troncation de 'double' à 'float'
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(724,77): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(724,62): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(724,47): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(725,38): warning C4305: 'argument' : troncation de 'double' à 'float'
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(730,116): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(730,95): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(730,74): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(731,38): warning C4305: 'argument' : troncation de 'double' à 'float'
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(736,95): warning C4305: 'argument' : troncation de 'double' à 'float'
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(737,38): warning C4305: 'argument' : troncation de 'double' à 'float'
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(746,91): warning C4305: 'argument' : troncation de 'double' à 'float'
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(751,45): warning C4305: 'argument' : troncation de 'double' à 'float'
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(751,91): warning C4305: 'argument' : troncation de 'double' à 'float'
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(756,45): warning C4305: 'argument' : troncation de 'double' à 'float'
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\scene.cpp(756,72): warning C4305: 'argument' : troncation de 'double' à 'float'
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\main.cpp(457,11): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\main.cpp(461,12): warning C4244: 'return' : conversion de 'double' en 'float', perte possible de données
   P3D_ex1.vcxproj -> C:\Users\jfons\Documents\P3D_proj\x64\Debug\P3D_ex1.exe
   0 fichier(s) copiÚ(s)
