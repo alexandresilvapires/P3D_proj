@@ -516,7 +516,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 				vis = vis && (dist <= (light->position - biased_hp).length());
 
 				//printf("Color before: (%f, %f, %f)\n", color.r(), color.g(), color.b());
-				color += (obj->GetMaterial()->GetDiffColor() + obj->GetMaterial()->GetSpecColor())
+				color %= (obj->GetMaterial()->GetDiffColor() % obj->GetMaterial()->GetSpecColor())
 					* max(0.f, normal_at_hp * light_dir) * light->color
 					* vis;
 				//printf("Color after: (%f, %f, %f)\n\n", color.r(), color.g(), color.b());
@@ -531,37 +531,38 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	if (depth >= MAX_DEPTH) {
 		return color;
 	}
+	
+	// Calculate fresnel
+	float kr = fresnel(ior_1, closest_obj->GetMaterial()->GetRefrIndex(), ray.direction, normal_at_hp);
+	
+	if (closest_obj->GetMaterial()->GetReflection() > 0) {
+		Vector v_vector = ray.origin - biased_hp;
+		Vector ref_dir = (normal_to_use * (v_vector * normal_to_use) * 2 - v_vector).normalize();
+	
+		Ray reflected_ray = Ray(biased_hp, ref_dir);
+	
+		Color refl_color = rayTracing(reflected_ray, depth + 1, ior_1);
+		color %= refl_color * closest_obj->GetMaterial()->GetSpecular() * kr;
+	}
+	
+	if (closest_obj->GetMaterial()->GetRefrIndex() > 0) {
+		Vector v_hat = (biased_hp - scene->GetCamera()->GetEye()).normalize();
+		Vector v_t = normal_to_use * (v_hat * normal_to_use) - v_hat;
+	
+		float sin_i = v_t.length();
+		float sin_t = (ior_1 / closest_obj->GetMaterial()->GetRefrIndex()) * sin_i;
+		float cos_t = sqrt(1 - sin_t * sin_t);
+	
+		Vector t_hat = v_t.normalize();
+	
+		Vector refr_dir = t_hat * sin_t - normal_to_use * cos_t;
+	
+		Ray refr_ray = Ray(biased_hp, refr_dir);
+		Color refr_color = rayTracing(refr_ray, depth + 1, closest_obj->GetMaterial()->GetRefrIndex());
+	
+		color %= refr_color * closest_obj->GetMaterial()->GetTransmittance() * (1 - kr);
 
-	//// Calculate fresnel
-	//float kr = fresnel(ior_1, closest_obj->GetMaterial()->GetRefrIndex(), ray.direction, normal_at_hp);
-	//
-	//if (closest_obj->GetMaterial()->GetReflection() > 0) {
-	//	Vector v_vector = ray.origin - biased_hp;
-	//	Vector ref_dir = (normal_to_use * (v_vector * normal_to_use) * 2 - v_vector).normalize();
-	//
-	//	Ray reflected_ray = Ray(biased_hp, ref_dir);
-	//
-	//	Color refl_color = rayTracing(reflected_ray, depth + 1, ior_1);
-	//	color += refl_color * closest_obj->GetMaterial()->GetSpecular() * kr;
-	//}
-	//
-	//if (closest_obj->GetMaterial()->GetRefrIndex() > 0) {
-	//	Vector v_hat = (biased_hp - scene->GetCamera()->GetEye()).normalize();
-	//	Vector v_t = normal_to_use * (v_hat * normal_to_use) - v_hat;
-	//
-	//	float sin_i = v_t.length();
-	//	float sin_t = (ior_1 / closest_obj->GetMaterial()->GetRefrIndex()) * sin_i;
-	//	float cos_t = sqrt(1 - sin_t * sin_t);
-	//
-	//	Vector t_hat = v_t.normalize();
-	//
-	//	Vector refr_dir = t_hat * sin_t - normal_to_use * cos_t;
-	//
-	//	Ray refr_ray = Ray(biased_hp, refr_dir);
-	//	Color refr_color = rayTracing(refr_ray, depth + 1, closest_obj->GetMaterial()->GetRefrIndex());
-	//
-	//	color += refr_color * closest_obj->GetMaterial()->GetTransmittance() * (1 - kr);
-	//}
+	}
 	return color;
 }
 
