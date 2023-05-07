@@ -118,6 +118,7 @@ Plane::Plane(Vector& P0, Vector& P1, Vector& P2)
    else
    {
      PN = PN.normalize();
+
 	 //Calculate D
      D  = -(PN * P0); // 
    }
@@ -129,17 +130,16 @@ Plane::Plane(Vector& P0, Vector& P1, Vector& P2)
 
 bool Plane::intercepts( Ray& r, float& t )
 {
-	float norm_dir_dp = this->PN * r.direction;
-	if (norm_dir_dp == 0) { // plane and ray are parallel
-		return false;
+	// from https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-plane-and-ray-disk-intersection.html
+
+	float denom = this->PN * r.direction;
+	if (std::abs(denom) > 1e-6) {
+		float numer = (r.origin * this->PN) + this->D;
+		t = -numer / denom;
+		return (t >= 0);
 	}
-	
-	float t_intersect = -(r.origin * this->PN - D) / norm_dir_dp;
 
-	if (t_intersect < 0) return false; // plane is behind the origin 
-
-	t = t_intersect;
-	return true;
+	return false; // ray is parallel to the plane
 }
 
 Vector Plane::getNormal(Vector point) 
