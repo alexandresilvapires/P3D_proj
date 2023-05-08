@@ -515,11 +515,11 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 				// if the object hit by the shadow feeler is *behind* the light source, it shouldn't be considered
 				vis = vis && (dist <= (light->position - biased_hp).length());
 
-				//printf("Color before: (%f, %f, %f)\n", color.r(), color.g(), color.b());
-				color %= (obj->GetMaterial()->GetDiffColor() % obj->GetMaterial()->GetSpecColor())
-					* max(0.f, normal_at_hp * light_dir) * light->color
-					* vis;
-				//printf("Color after: (%f, %f, %f)\n\n", color.r(), color.g(), color.b());
+				Vector halfway = (light_dir + (biased_hp - ray.origin)).normalize();
+				color += ((obj->GetMaterial()->GetDiffColor() * obj->GetMaterial()->GetDiffuse() * (light_dir * normal_at_hp * dist)) +
+						(obj->GetMaterial()->GetSpecColor() * obj->GetMaterial()->GetSpecular() * pow(halfway *normal_at_hp, 2)))
+						* light->color * vis * max(0.f, normal_at_hp * light_dir);
+				color = color.clamp();
 			}
 		}
 	}
@@ -542,7 +542,8 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		Ray reflected_ray = Ray(biased_hp, ref_dir);
 	
 		Color refl_color = rayTracing(reflected_ray, depth + 1, ior_1);
-		color %= refl_color * closest_obj->GetMaterial()->GetSpecular() * kr;
+		color += refl_color * closest_obj->GetMaterial()->GetSpecular() * kr;
+	  color = color.clamp();
 	}
 	
 	if (closest_obj->GetMaterial()->GetRefrIndex() > 0) {
@@ -560,8 +561,9 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		Ray refr_ray = Ray(biased_hp, refr_dir);
 		Color refr_color = rayTracing(refr_ray, depth + 1, closest_obj->GetMaterial()->GetRefrIndex());
 	
-		color %= refr_color * closest_obj->GetMaterial()->GetTransmittance() * (1 - kr);
-
+		color += refr_color * closest_obj->GetMaterial()->GetTransmittance() * (1 - kr);
+	  color = color.clamp();
+	
 	}
 	return color;
 }
