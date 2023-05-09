@@ -82,6 +82,8 @@ int RES_X, RES_Y;
 
 int WindowHandle = 0;
 
+int AA_sample_size = 1;
+
 
 
 /////////////////////////////////////////////////////////////////////// ERRORS
@@ -590,12 +592,23 @@ void renderScene()
 			Color color;
 
 			Vector pixel;  //viewport coordinates
-			pixel.x = x + 0.5f;
-			pixel.y = y + 0.5f;
+			
+			for (int p = 0; p < AA_sample_size; p++) {
+				for (int q = 0; q < AA_sample_size; q++) {
 
-			Ray ray = scene->GetCamera()->PrimaryRay(pixel);   //function from camera.h
+					pixel.x = x + (p + (0.5f + rand_float()) / AA_sample_size);
+					pixel.y = y + (q + (0.5f + rand_float()) / AA_sample_size);
 
-			color = rayTracing(ray, 1, 1.0).clamp();
+					Ray ray = scene->GetCamera()->PrimaryRay(pixel);   //function from camera.h
+
+					Color newColor = rayTracing(ray, 1, 1.0);
+
+					color += newColor;
+				}
+			}
+
+			color = color * (1.0 / (AA_sample_size * AA_sample_size));
+			
 
 			img_Data[counter++] = u8fromfloat((float)color.r());
 			img_Data[counter++] = u8fromfloat((float)color.g());
