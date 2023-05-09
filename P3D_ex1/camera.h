@@ -83,11 +83,23 @@ public:
 		return Ray(eye, ray_dir);
 	}
 
-	Ray PrimaryRay(const Vector& lens_sample, const Vector& pixel_sample) // DOF: Rays cast from  a thin lens sample to a pixel sample
+	Ray PrimaryRay(const Vector& lens_sample, const Vector& pixel_sample) // DOF: Rays cast from a thin lens sample to a pixel sample
 	{
-		
-		Vector ray_dir;
-		Vector eye_offset;
+		float x_scalar = this->w * (pixel_sample.x / GetResX() - 0.5);
+		float y_scalar = this->h * (pixel_sample.y / GetResY() - 0.5);
+		float z_scalar = GetPlaneDist();
+
+		Vector centre_ray = Vector(x_scalar, y_scalar, -z_scalar); // goes from eye to pixel_sample, in camera coords
+
+		Vector actual_p = Vector(centre_ray.x * focal_ratio,
+								centre_ray.y * focal_ratio,
+								centre_ray.z * focal_ratio); // in camera coords.
+
+		Vector ray_dir = (this->u * (actual_p.x - lens_sample.x) 
+						+ this->v * (actual_p.y - lens_sample.y) 
+						+ this->n * actual_p.z).normalize(); // in world coordinates
+
+		Vector eye_offset = eye + this-> u * lens_sample.x + this-> v * lens_sample.y; // also in world coordinates
 
 		return Ray(eye_offset, ray_dir);
 	}

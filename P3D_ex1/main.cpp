@@ -592,6 +592,7 @@ void renderScene()
 			Color color;
 
 			Vector pixel;  //viewport coordinates
+			Vector lens_sample;
 			
 			for (int p = 0; p < AA_sample_size; p++) {
 				for (int q = 0; q < AA_sample_size; q++) {
@@ -599,7 +600,10 @@ void renderScene()
 					pixel.x = x + (p + (0.5f + rand_float()) / AA_sample_size);
 					pixel.y = y + (q + (0.5f + rand_float()) / AA_sample_size);
 
-					Ray ray = scene->GetCamera()->PrimaryRay(pixel);   //function from camera.h
+					lens_sample = Vector(rand_float() * scene->GetCamera()->GetAperture(),
+										rand_float() * scene->GetCamera()->GetAperture(), 0); // random coords in unit disc
+
+					Ray ray = scene->GetCamera()->PrimaryRay(lens_sample, pixel);   //function from camera.h
 
 					Color newColor = rayTracing(ray, 1, 1.0);
 
