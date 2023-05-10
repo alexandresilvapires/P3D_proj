@@ -541,14 +541,19 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		Vector v_vector = ray.origin - biased_hp;
 		Vector ref_dir = (normal_to_use * (v_vector * normal_to_use) * 2 - v_vector).normalize();
 	
-		Ray reflected_ray = Ray(biased_hp, ref_dir);
-	
-		Color refl_color = rayTracing(reflected_ray, depth + 1, ior_1);
-		color += refl_color * closest_obj->GetMaterial()->GetSpecular() * kr;
-	  color = color.clamp();
+		// we were supposed to use a roughness parameter, but it is missing
+		Vector fuzzy_direction = (ref_dir +
+								Vector(rand_float(), rand_float(), rand_float()) * 0.3f).normalize();
+
+		Ray reflected_ray = Ray(biased_hp, fuzzy_direction);
+		if (fuzzy_direction * normal_to_use > 0) { // otherwise, the ray is hitting at 90º (not sure about this if)
+			Color refl_color = rayTracing(reflected_ray, depth + 1, ior_1);
+			color += refl_color * closest_obj->GetMaterial()->GetSpecular() * kr; // falta a specular colour deste material? i.e. falta um GetSpecColor()
+			color = color.clamp();
+		}
 	}
 	
-	if (closest_obj->GetMaterial()->GetRefrIndex() > 0) {
+	if (closest_obj->GetMaterial()->GetTransmittance() != 0) {
 		Vector v_hat = (biased_hp - scene->GetCamera()->GetEye()).normalize();
 		Vector v_t = normal_to_use * (v_hat * normal_to_use) - v_hat;
 	
