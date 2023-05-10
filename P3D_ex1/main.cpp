@@ -524,12 +524,12 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 			}
 			Vector halfway = (light_dir + (ray.origin - biased_hp).normalize()).normalize();
 
-			color += (
-				(light->color % closest_obj->GetMaterial()->GetDiffColor() * closest_obj->GetMaterial()->GetDiffuse() *
-					(light_dir * normal_at_hp)) +
-				(light->color % closest_obj->GetMaterial()->GetSpecColor()) * closest_obj->GetMaterial()->GetSpecular()
-				* pow(halfway * normal_at_hp, closest_obj->GetMaterial()->GetShine())
-				) * vis;
+			color += 
+				((light->color % closest_obj->GetMaterial()->GetDiffColor()).clamp() * closest_obj->GetMaterial()->GetDiffuse() *
+					(light_dir * normal_at_hp)).clamp() +
+				((light->color % closest_obj->GetMaterial()->GetSpecColor()).clamp() * closest_obj->GetMaterial()->GetSpecular() *
+					pow(halfway * normal_at_hp, closest_obj->GetMaterial()->GetShine())).clamp()
+				 * vis;
 			color = color.clamp();
 		}
 	}
