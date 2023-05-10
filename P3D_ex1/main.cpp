@@ -509,20 +509,28 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		if (light_dir * normal_at_hp > 0) {
 			Ray shadow_ray = Ray(biased_hp, light_dir);
 
+			bool vis = true;
+
 			for (int i = 0; i < num_objs; i++) {
 				Object* obj = scene->getObject(i);
 				float dist = 0;
 
-				bool vis = !obj->intercepts(shadow_ray, dist);
-				// if the object hit by the shadow feeler is *behind* the light source, it shouldn't be considered
-				vis = vis && (dist <= (light->position - biased_hp).length());
-
-				Vector halfway = (light_dir + (biased_hp - ray.origin)).normalize();
-				color += ((obj->GetMaterial()->GetDiffColor() * obj->GetMaterial()->GetDiffuse() * (light_dir * normal_at_hp * dist)) +
-						(obj->GetMaterial()->GetSpecColor() * obj->GetMaterial()->GetSpecular() * pow(halfway *normal_at_hp, 2)))
-						* light->color * vis * max(0.f, normal_at_hp * light_dir);
-				color = color.clamp();
+				bool hits_obj = obj->intercepts(shadow_ray, dist);
+				if (hits_obj) {
+					// if the object hit by the shadow feeler is *behind* the light source, it shouldn't be considered
+					hits_obj = dist < (light->position - biased_hp).length();
+				}
+				vis = vis && !hits_obj;
 			}
+			Vector halfway = (light_dir + (ray.origin - biased_hp).normalize()).normalize();
+
+			color += (
+				(light->color % closest_obj->GetMaterial()->GetDiffColor() * closest_obj->GetMaterial()->GetDiffuse() *
+					(light_dir * normal_at_hp)) +
+				(light->color % closest_obj->GetMaterial()->GetSpecColor()) * closest_obj->GetMaterial()->GetSpecular()
+				* pow(halfway * normal_at_hp, closest_obj->GetMaterial()->GetShine())
+				) * vis;
+			color = color.clamp();
 		}
 	}
 
@@ -535,7 +543,10 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	}
 	
 	// Calculate fresnel
-	float kr = fresnel(ior_1, closest_obj->GetMaterial()->GetRefrIndex(), ray.direction, normal_at_hp);
+	float kr = 1;
+	if (closest_obj->GetMaterial()->GetTransmittance() > 0) {
+		kr = fresnel(ior_1, closest_obj->GetMaterial()->GetRefrIndex(), ray.direction, normal_at_hp);
+	}
 	
 	if (closest_obj->GetMaterial()->GetReflection() > 0) {
 		Vector v_vector = ray.origin - biased_hp;
@@ -544,11 +555,11 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		Ray reflected_ray = Ray(biased_hp, ref_dir);
 	
 		Color refl_color = rayTracing(reflected_ray, depth + 1, ior_1);
-		color += refl_color * closest_obj->GetMaterial()->GetSpecular() * kr;
+		color += refl_color * closest_obj->GetMaterial()->GetReflection() * kr;
 	  color = color.clamp();
 	}
 	
-	if (closest_obj->GetMaterial()->GetRefrIndex() > 0) {
+	if (closest_obj->GetMaterial()->GetRefrIndex() > 0 && kr != 1) {
 		Vector v_hat = (biased_hp - scene->GetCamera()->GetEye()).normalize();
 		Vector v_t = normal_to_use * (v_hat * normal_to_use) - v_hat;
 	
