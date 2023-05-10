@@ -501,36 +501,45 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 
 	Vector biased_hp = closest_hp + normal_to_use * EPSILON;
 
+	int num_lights_per_light = 9; // for soft shadows
+
 	// Any objects between the intersection and direct light? If so, they're in the shadow.
 	for (int i = 0; i < num_lights; i++) {
 		Light* light = scene->getLight(i);
-		Vector light_dir = (light->position - biased_hp).normalize();
+		
+		// approximate each light by nine lights for soft shadowing
+		for (int j = 0; j < num_lights_per_light; j++) {
+			Vector perturbed_light_pos = light->position + (((float)std::rand() / (float)std::RAND_MAX) - 0.5);
+			Vector light_dir = (perturbed_light_pos - biased_hp).normalize();
 
-		if (light_dir * normal_at_hp > 0) {
-			Ray shadow_ray = Ray(biased_hp, light_dir);
+			// FALTA ISTO: shadow_intensity += 1 / num_lights_per_light
 
-			bool vis = true;
+			if (light_dir * normal_at_hp > 0) {
+				Ray shadow_ray = Ray(biased_hp, light_dir);
 
-			for (int i = 0; i < num_objs; i++) {
-				Object* obj = scene->getObject(i);
-				float dist = 0;
+				bool vis = true;
 
-				bool hits_obj = obj->intercepts(shadow_ray, dist);
-				if (hits_obj) {
-					// if the object hit by the shadow feeler is *behind* the light source, it shouldn't be considered
-					hits_obj = dist < (light->position - biased_hp).length();
+				for (int t = 0; t < num_objs; t++) {
+					Object* obj = scene->getObject(t);
+					float dist = 0;
+
+					bool hits_obj = obj->intercepts(shadow_ray, dist);
+					if (hits_obj) {
+						// if the object hit by the shadow feeler is *behind* the light source, it shouldn't be considered
+						hits_obj = dist < (light->position - biased_hp).length();
+					}
+					vis = vis && !hits_obj;
 				}
-				vis = vis && !hits_obj;
-			}
-			Vector halfway = (light_dir + (ray.origin - biased_hp).normalize()).normalize();
+				Vector halfway = (light_dir + (ray.origin - biased_hp).normalize()).normalize();
 
-			color += 
-				((light->color % closest_obj->GetMaterial()->GetDiffColor()).clamp() * closest_obj->GetMaterial()->GetDiffuse() *
-					(light_dir * normal_at_hp)).clamp() +
-				((light->color % closest_obj->GetMaterial()->GetSpecColor()).clamp() * closest_obj->GetMaterial()->GetSpecular() *
-					pow(halfway * normal_at_hp, closest_obj->GetMaterial()->GetShine())).clamp()
-				 * vis;
-			color = color.clamp();
+				color += 
+					((light->color % closest_obj->GetMaterial()->GetDiffColor()).clamp() * closest_obj->GetMaterial()->GetDiffuse() *
+						(light_dir * normal_at_hp)).clamp() +
+					((light->color % closest_obj->GetMaterial()->GetSpecColor()).clamp() * closest_obj->GetMaterial()->GetSpecular() *
+						pow(halfway * normal_at_hp, closest_obj->GetMaterial()->GetShine())).clamp()
+					 * vis;
+				color = color.clamp();
+			}
 		}
 	}
 
