@@ -541,9 +541,8 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		Vector v_vector = ray.origin - biased_hp;
 		Vector ref_dir = (normal_to_use * (v_vector * normal_to_use) * 2 - v_vector).normalize();
 	
-		// we were supposed to use a roughness parameter, but it is missing
-		Vector fuzzy_direction = (ref_dir +
-								Vector(rand_float(), rand_float(), rand_float()) * 0.3f).normalize();
+		// !! we were supposed to use a roughness parameter, but it is missing
+		Vector fuzzy_direction = (ref_dir + rnd_unit_sphere() * 0.3f).normalize();
 
 		Ray reflected_ray = Ray(biased_hp, fuzzy_direction);
 		if (fuzzy_direction * normal_to_use > 0) { // otherwise, the ray is hitting at 90º (not sure about this if)
@@ -569,8 +568,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		Color refr_color = rayTracing(refr_ray, depth + 1, closest_obj->GetMaterial()->GetRefrIndex());
 	
 		color += refr_color * closest_obj->GetMaterial()->GetTransmittance() * (1 - kr);
-	  color = color.clamp();
-	
+		color = color.clamp();
 	}
 	return color;
 }
@@ -605,8 +603,7 @@ void renderScene()
 					pixel.x = x + (p + (0.5f + rand_float()) / AA_sample_size);
 					pixel.y = y + (q + (0.5f + rand_float()) / AA_sample_size);
 
-					lens_sample = Vector(rand_float() * scene->GetCamera()->GetAperture(),
-										rand_float() * scene->GetCamera()->GetAperture(), 0); // random coords in unit disc
+					lens_sample = rnd_unit_disk() * scene->GetCamera()->GetAperture(); // random coords in unit disc
 
 					Ray ray = scene->GetCamera()->PrimaryRay(lens_sample, pixel);   //function from camera.h
 
