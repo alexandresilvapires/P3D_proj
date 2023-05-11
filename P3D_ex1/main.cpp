@@ -25,7 +25,7 @@
 #include "macros.h"
 
 //Enable OpenGL drawing.  
-bool drawModeEnabled = false;
+bool drawModeEnabled = true;
 
 bool P3F_scene = false; //choose between P3F scene or a built-in random scene
 
@@ -82,7 +82,7 @@ int RES_X, RES_Y;
 
 int WindowHandle = 0;
 
-int AA_sample_size = 2;
+int AA_sample_size = 1;
 
 
 
@@ -549,11 +549,10 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 
 					color +=
 						((light->color * closest_obj->GetMaterial()->GetDiffColor()) * closest_obj->GetMaterial()->GetDiffuse() *
-							max(perturbed_light_dir * normal_to_use, 0.0)) +
+							max(perturbed_light_dir * normal_to_use, 0.0f)) +
 						((light->color * closest_obj->GetMaterial()->GetSpecColor()) * closest_obj->GetMaterial()->GetSpecular() *
-							pow(max(halfway * normal_to_use, 0), closest_obj->GetMaterial()->GetShine())).clamp();
+							pow(max(halfway * normal_to_use, 0.0f), closest_obj->GetMaterial()->GetShine()));
 				}
-				color = color.clamp();
 			}
 	}
 
@@ -562,7 +561,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	// ---	TIME FOR PROPER PHYSICS		---
 
 	if (depth >= MAX_DEPTH) {
-		return color.clamp();
+		return color;
 	}
 	// Calculate fresnel
 	float kr = 1;
@@ -574,19 +573,18 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		Vector v_vector = ray.origin - biased_hp;
 		Vector ref_dir = (normal_to_use * (v_vector * normal_to_use) * 2 - v_vector).normalize();
 	
-		// !! we were supposed to use a roughness parameter, but it is missing
-		Vector fuzzy_direction = (ref_dir + rnd_unit_sphere() * 0.3f).normalize();
+		// !! roughness parameter for each object
+		Vector fuzzy_direction = (ref_dir + rnd_unit_sphere() * 0.0f).normalize();
 
 		Ray reflected_ray = Ray(biased_hp, fuzzy_direction);
 		if (fuzzy_direction * normal_to_use > 0) { // otherwise, the ray is hitting at 90º (not sure about this if)
 			Color refl_color = rayTracing(reflected_ray, depth + 1, ior_1);
-			color += refl_color * closest_obj->GetMaterial()->GetReflection() * kr;
-			color = color.clamp();
+			color += refl_color * closest_obj->GetMaterial()->GetSpecColor() * kr;
 		}
 	}
 	
-	if (closest_obj->GetMaterial()->GetRefrIndex() > 0 && kr != 1) {
-		Vector v_hat = (biased_hp - scene->GetCamera()->GetEye()).normalize();
+	if (closest_obj->GetMaterial()->GetTransmittance() > 0) {
+		Vector v_hat = ray.direction * (-1);
 		Vector v_t = normal_to_use * (v_hat * normal_to_use) - v_hat;
 	
 		float sin_i = v_t.length();
@@ -595,15 +593,14 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	
 		Vector t_hat = v_t.normalize();
 	
-		Vector refr_dir = t_hat * sin_t - normal_to_use * cos_t;
+		Vector refr_dir = (t_hat * sin_t - normal_to_use * cos_t).normalize();
 	
 		Ray refr_ray = Ray(biased_hp, refr_dir);
 		Color refr_color = rayTracing(refr_ray, depth + 1, closest_obj->GetMaterial()->GetRefrIndex());
 	
 		color += refr_color * closest_obj->GetMaterial()->GetTransmittance() * (1 - kr);
-		color = color.clamp();
 	}
-	return color.clamp();
+	return color;
 }
 
 
@@ -638,11 +635,9 @@ void renderScene()
 
 					lens_sample = rnd_unit_disk() * scene->GetCamera()->GetAperture(); // random coords in unit disc
 
-					Ray ray = scene->GetCamera()->PrimaryRay(pixel);   //function from camera.h
+					Ray ray = scene->GetCamera()->PrimaryRay(lens_sample, pixel);   //function from camera.h
 
-					Color newColor = rayTracing(ray, 1, 1.0);
-
-					color += newColor;
+					color += rayTracing(ray, 1, 1.0).clamp();
 				}
 			}
 
