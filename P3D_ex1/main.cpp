@@ -27,7 +27,7 @@
 //Enable OpenGL drawing.  
 bool drawModeEnabled = false;
 
-bool P3F_scene = true; //choose between P3F scene or a built-in random scene
+bool P3F_scene = false; //choose between P3F scene or a built-in random scene
 
 #define MAX_DEPTH 4  //number of bounces
 
@@ -508,13 +508,12 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		Light* light = scene->getLight(i);
 		
 		// SOFT SHADOWING WITH ANTIALIASING
-		/*
 		Vector light_dir = (light->position - biased_hp).normalize();
 		
 		// Define the parallelogram of the light with two orthogonal vectors
 		Vector up = Vector(0, 1, 0);
-		Vector a = up.cross(light_dir).normalize();
-		Vector b = light_dir.cross(a).normalize();
+		Vector a = (up % light_dir).normalize();
+		Vector b = (light_dir % a).normalize();
 
 		// Scale the vectors to get corner point
 		a *= 0.5;
@@ -522,18 +521,10 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		Vector corner_point = light->position - a - b;
 
 		// Choose a random point from the parallelogram
-		float eps1 = (float)std::rand() / RAND_MAX;
-		float eps2 = (float)std::rand() / RAND_MAX;
-		Vector random_point = corner_point + eps1 * 2 * a + eps2 * 2 * b;
-		Vector light_dir = (random_point - biased_hp).normalize();
-		*/
-		
-		// SOFT SHADOWING WITHOUT ANTIALIASING
-		for (int j = 0; j < num_lights_per_light; j++) {
-			Vector perturbed_light_pos = light->position + Vector(rand_float() - 0.5, rand_float() - 0.5, rand_float() - 0.5);
-			Vector light_dir = (perturbed_light_pos - biased_hp).normalize();
+		Vector perturbed_light_pos = corner_point + a * rand_float() * 2 + b * rand_float() * 2;
+		Vector perturbed_light_dir = (perturbed_light_pos - biased_hp).normalize();
 
-			// FALTA ISTO: shadow_intensity += 1 / num_lights_per_light
+		// FALTA ISTO: shadow_intensity += 1 / num_lights_per_light
 
 			if (light_dir * normal_to_use > 0) {
 				Ray shadow_ray = Ray(biased_hp, light_dir);
@@ -553,17 +544,17 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 						}
 					}
 				}
-				Vector halfway = (light_dir + (ray.origin - biased_hp).normalize()).normalize();
+				if (vis) {
+					Vector halfway = (perturbed_light_dir - ray.direction).normalize();
 
-				color += 
-					((light->color * closest_obj->GetMaterial()->GetDiffColor()) * closest_obj->GetMaterial()->GetDiffuse() *
-						(light_dir * normal_to_use)).clamp() +
-					((light->color * closest_obj->GetMaterial()->GetSpecColor()).clamp() * closest_obj->GetMaterial()->GetSpecular() *
-						pow(halfway * normal_to_use, closest_obj->GetMaterial()->GetShine())).clamp()
-					 * vis ;
+					color +=
+						((light->color * closest_obj->GetMaterial()->GetDiffColor()) * closest_obj->GetMaterial()->GetDiffuse() *
+							max(perturbed_light_dir * normal_to_use, 0.0)) +
+						((light->color * closest_obj->GetMaterial()->GetSpecColor()) * closest_obj->GetMaterial()->GetSpecular() *
+							pow(max(halfway * normal_to_use, 0), closest_obj->GetMaterial()->GetShine())).clamp();
+				}
 				color = color.clamp();
 			}
-		}
 	}
 
 	// ---	RAY CASTING PART FINISHED	---
@@ -587,7 +578,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		Vector fuzzy_direction = (ref_dir + rnd_unit_sphere() * 0.3f).normalize();
 
 		Ray reflected_ray = Ray(biased_hp, fuzzy_direction);
-		if (fuzzy_direction * normal_to_use > 0) { // otherwise, the ray is reflecting at >= 90º
+		if (fuzzy_direction * normal_to_use > 0) { // otherwise, the ray is hitting at 90º (not sure about this if)
 			Color refl_color = rayTracing(reflected_ray, depth + 1, ior_1);
 			color += refl_color * closest_obj->GetMaterial()->GetReflection() * kr;
 			color = color.clamp();
@@ -645,7 +636,7 @@ void renderScene()
 					pixel.x = x + (p + (0.5f + rand_float()) / AA_sample_size);
 					pixel.y = y + (q + (0.5f + rand_float()) / AA_sample_size);
 
-					lens_sample = rnd_unit_disk() * scene->GetCamera()->GetAperture() / 2; // random coords in unit disc
+					lens_sample = rnd_unit_disk() * scene->GetCamera()->GetAperture(); // random coords in unit disc
 
 					Ray ray = scene->GetCamera()->PrimaryRay(pixel);   //function from camera.h
 
