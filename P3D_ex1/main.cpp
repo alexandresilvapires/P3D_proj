@@ -575,22 +575,28 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		Vector ref_dir = (normal_to_use * (v_vector * normal_to_use) * 2 - v_vector).normalize();
 	
 		// !! we were supposed to use a roughness parameter, but it is missing
-		Vector fuzzy_direction = (ref_dir + rnd_unit_sphere() * 0.3f).normalize();
+		Vector fuzzy_direction = (ref_dir + rnd_unit_sphere() * 0.1f).normalize();
 
 		Ray reflected_ray = Ray(biased_hp, fuzzy_direction);
 		if (fuzzy_direction * normal_to_use > 0) { // otherwise, the ray is hitting at 90º (not sure about this if)
 			Color refl_color = rayTracing(reflected_ray, depth + 1, ior_1);
-			color += refl_color * closest_obj->GetMaterial()->GetReflection() * kr;
+			color += refl_color * kr * closest_obj->GetMaterial()->GetSpecColor();
 			color = color.clamp();
 		}
 	}
 	
 	if (closest_obj->GetMaterial()->GetRefrIndex() > 0 && kr != 1) {
-		Vector v_hat = (biased_hp - scene->GetCamera()->GetEye()).normalize();
+		Vector v_hat = ray.direction * (-1.0);
 		Vector v_t = normal_to_use * (v_hat * normal_to_use) - v_hat;
 	
 		float sin_i = v_t.length();
-		float sin_t = (ior_1 / closest_obj->GetMaterial()->GetRefrIndex()) * sin_i;
+		float sin_t;
+		if (ior_1 != 1) {
+			sin_t = ior_1 * sin_i;
+		}
+		else {
+			sin_t = (ior_1 / closest_obj->GetMaterial()->GetRefrIndex()) * sin_i;
+		}
 		float cos_t = sqrt(1 - sin_t * sin_t);
 	
 		Vector t_hat = v_t.normalize();
@@ -598,7 +604,14 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		Vector refr_dir = t_hat * sin_t - normal_to_use * cos_t;
 	
 		Ray refr_ray = Ray(biased_hp, refr_dir);
-		Color refr_color = rayTracing(refr_ray, depth + 1, closest_obj->GetMaterial()->GetRefrIndex());
+
+		Color refr_color;
+		if (ior_1 != 1) {
+			refr_color = rayTracing(refr_ray, depth + 1, 1);
+		}
+		else {
+			refr_color = rayTracing(refr_ray, depth + 1, closest_obj->GetMaterial()->GetRefrIndex());
+		}
 	
 		color += refr_color * closest_obj->GetMaterial()->GetTransmittance() * (1 - kr);
 		color = color.clamp();
