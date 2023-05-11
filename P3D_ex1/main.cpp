@@ -507,7 +507,28 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	for (int i = 0; i < num_lights; i++) {
 		Light* light = scene->getLight(i);
 		
-		// approximate each light by nine lights for soft shadowing
+		// SOFT SHADOWING WITH ANTIALIASING
+		/*
+		Vector light_dir = (light->position - biased_hp).normalize();
+		
+		// Define the parallelogram of the light with two orthogonal vectors
+		Vector up = Vector(0, 1, 0);
+		Vector a = up.cross(light_dir).normalize();
+		Vector b = light_dir.cross(a).normalize();
+
+		// Scale the vectors to get corner point
+		a *= 0.5;
+		b *= 0.5;
+		Vector corner_point = light->position - a - b;
+
+		// Choose a random point from the parallelogram
+		float eps1 = (float)std::rand() / RAND_MAX;
+		float eps2 = (float)std::rand() / RAND_MAX;
+		Vector random_point = corner_point + eps1 * 2 * a + eps2 * 2 * b;
+		Vector light_dir = (random_point - biased_hp).normalize();
+		*/
+		
+		// SOFT SHADOWING WITHOUT ANTIALIASING
 		for (int j = 0; j < num_lights_per_light; j++) {
 			Vector perturbed_light_pos = light->position + (((float)std::rand() / (float)std::RAND_MAX) - 0.5);
 			Vector light_dir = (perturbed_light_pos - biased_hp).normalize();
