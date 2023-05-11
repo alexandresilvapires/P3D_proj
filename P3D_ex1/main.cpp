@@ -82,7 +82,7 @@ int RES_X, RES_Y;
 
 int WindowHandle = 0;
 
-int AA_sample_size = 1;
+int AA_sample_size = 2;
 
 
 
@@ -495,13 +495,13 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	Vector normal_at_hp = closest_obj->getNormal(closest_hp);
 
 	Vector normal_to_use = normal_at_hp;
-	if (normal_at_hp * ray.direction < 0) {
+	if (normal_at_hp * ray.direction > 0) {
 		normal_to_use = normal_at_hp * (-1); // if dot is negative, that means that we are inside the object -> let's use the symmetric normal.
 	}
 
 	Vector biased_hp = closest_hp + normal_to_use * EPSILON;
 
-	int num_lights_per_light = 9; // for soft shadows
+	int num_lights_per_light = 1; // for soft shadows
 
 	// Any objects between the intersection and direct light? If so, they're in the shadow.
 	for (int i = 0; i < num_lights; i++) {
@@ -530,12 +530,12 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		
 		// SOFT SHADOWING WITHOUT ANTIALIASING
 		for (int j = 0; j < num_lights_per_light; j++) {
-			Vector perturbed_light_pos = light->position + (((float)std::rand() / (float)std::RAND_MAX) - 0.5);
+			Vector perturbed_light_pos = light->position + Vector(rand_float() - 0.5, rand_float() - 0.5, rand_float() - 0.5);
 			Vector light_dir = (perturbed_light_pos - biased_hp).normalize();
 
 			// FALTA ISTO: shadow_intensity += 1 / num_lights_per_light
 
-			if (light_dir * normal_at_hp > 0) {
+			if (light_dir * normal_to_use > 0) {
 				Ray shadow_ray = Ray(biased_hp, light_dir);
 
 				bool vis = true;
@@ -547,18 +547,20 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 					bool hits_obj = obj->intercepts(shadow_ray, dist);
 					if (hits_obj) {
 						// if the object hit by the shadow feeler is *behind* the light source, it shouldn't be considered
-						hits_obj = dist < (light->position - biased_hp).length();
+						if (dist < (perturbed_light_pos - biased_hp).length()) {
+							vis = false;
+							break;
+						}
 					}
-					vis = vis && !hits_obj;
 				}
 				Vector halfway = (light_dir + (ray.origin - biased_hp).normalize()).normalize();
 
 				color += 
-					((light->color % closest_obj->GetMaterial()->GetDiffColor()).clamp() * closest_obj->GetMaterial()->GetDiffuse() *
-						(light_dir * normal_at_hp)).clamp() +
-					((light->color % closest_obj->GetMaterial()->GetSpecColor()).clamp() * closest_obj->GetMaterial()->GetSpecular() *
-						pow(halfway * normal_at_hp, closest_obj->GetMaterial()->GetShine())).clamp()
-					 * vis;
+					((light->color * closest_obj->GetMaterial()->GetDiffColor()) * closest_obj->GetMaterial()->GetDiffuse() *
+						(light_dir * normal_to_use)).clamp() +
+					((light->color * closest_obj->GetMaterial()->GetSpecColor()).clamp() * closest_obj->GetMaterial()->GetSpecular() *
+						pow(halfway * normal_to_use, closest_obj->GetMaterial()->GetShine())).clamp()
+					 * vis ;
 				color = color.clamp();
 			}
 		}
@@ -569,13 +571,12 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	// ---	TIME FOR PROPER PHYSICS		---
 
 	if (depth >= MAX_DEPTH) {
-		return color;
+		return color.clamp();
 	}
-	
 	// Calculate fresnel
 	float kr = 1;
 	if (closest_obj->GetMaterial()->GetTransmittance() > 0) {
-		kr = fresnel(ior_1, closest_obj->GetMaterial()->GetRefrIndex(), ray.direction, normal_at_hp);
+		kr = fresnel(ior_1, closest_obj->GetMaterial()->GetRefrIndex(), ray.direction, normal_to_use);
 	}
 	
 	if (closest_obj->GetMaterial()->GetReflection() > 0) {
@@ -611,7 +612,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		color += refr_color * closest_obj->GetMaterial()->GetTransmittance() * (1 - kr);
 		color = color.clamp();
 	}
-	return color;
+	return color.clamp();
 }
 
 
@@ -646,7 +647,7 @@ void renderScene()
 
 					lens_sample = rnd_unit_disk() * scene->GetCamera()->GetAperture(); // random coords in unit disc
 
-					Ray ray = scene->GetCamera()->PrimaryRay(lens_sample, pixel);   //function from camera.h
+					Ray ray = scene->GetCamera()->PrimaryRay(pixel);   //function from camera.h
 
 					Color newColor = rayTracing(ray, 1, 1.0);
 

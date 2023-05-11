@@ -67,6 +67,23 @@ public:
   Color		operator %	(Color c) {
 	  return Color(std::max(c.R, R), std::max(c.G, G), std::max(c.B, B));
   }
+  
+  Color		operator /	(const Color& c)
+  {
+	  float uX = R;
+	  float uY = G;
+	  float uZ = B;
+
+	  float vX = c.r();
+	  float vY = c.g();
+	  float vZ = c.b();
+
+	  float sX = uY * vZ - uZ * vY;
+	  float sY = uZ * vX - uX * vZ;
+	  float sZ = uX * vY - uY * vX;
+
+	  return Color(sX, sY, sZ);
+  }
 
 
    friend inline
