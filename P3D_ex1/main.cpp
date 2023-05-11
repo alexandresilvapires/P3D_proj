@@ -586,7 +586,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		Vector fuzzy_direction = (ref_dir + rnd_unit_sphere() * 0.3f).normalize();
 
 		Ray reflected_ray = Ray(biased_hp, fuzzy_direction);
-		if (fuzzy_direction * normal_to_use > 0) { // otherwise, the ray is hitting at 90º (not sure about this if)
+		if (fuzzy_direction * normal_to_use > 0) { // otherwise, the ray is reflecting at >= 90º
 			Color refl_color = rayTracing(reflected_ray, depth + 1, ior_1);
 			color += refl_color * closest_obj->GetMaterial()->GetReflection() * kr;
 			color = color.clamp();
@@ -644,7 +644,7 @@ void renderScene()
 					pixel.x = x + (p + (0.5f + rand_float()) / AA_sample_size);
 					pixel.y = y + (q + (0.5f + rand_float()) / AA_sample_size);
 
-					lens_sample = rnd_unit_disk() * scene->GetCamera()->GetAperture(); // random coords in unit disc
+					lens_sample = rnd_unit_disk() * scene->GetCamera()->GetAperture() / 2; // random coords in unit disc
 
 					Ray ray = scene->GetCamera()->PrimaryRay(lens_sample, pixel);   //function from camera.h
 
