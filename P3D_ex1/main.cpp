@@ -601,7 +601,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	
 		Vector t_hat = v_t.normalize();
 	
-		Vector refr_dir = t_hat * sin_t - normal_to_use * cos_t;
+		Vector refr_dir = (t_hat * sin_t - normal_to_use * cos_t).normalize();
 	
 		Ray refr_ray = Ray(biased_hp, refr_dir);
 
@@ -613,7 +613,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 			refr_color = rayTracing(refr_ray, depth + 1, closest_obj->GetMaterial()->GetRefrIndex());
 		}
 	
-		color += refr_color * closest_obj->GetMaterial()->GetTransmittance() * (1 - kr);
+		color += refr_color * closest_obj->GetMaterial()->GetDiffColor() * (1 - kr);// *closest_obj->GetMaterial()->GetTransmittance();
 		color = color.clamp();
 	}
 	return color.clamp();
