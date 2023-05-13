@@ -567,7 +567,12 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	// Calculate fresnel
 	float kr = 1;
 	if (closest_obj->GetMaterial()->GetTransmittance() > 0) {
-		kr = fresnel(ior_1, closest_obj->GetMaterial()->GetRefrIndex(), ray.direction, normal_to_use);
+		if (ior_1 == 1) {
+			kr = fresnel(1, closest_obj->GetMaterial()->GetRefrIndex(), ray.direction, normal_to_use);
+		}
+		else{
+			kr = fresnel(closest_obj->GetMaterial()->GetRefrIndex(),1, ray.direction, normal_to_use);
+		}
 	}
 	
 	if (closest_obj->GetMaterial()->GetReflection() > 0) {
