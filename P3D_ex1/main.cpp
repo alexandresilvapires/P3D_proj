@@ -25,7 +25,7 @@
 #include "macros.h"
 
 //Enable OpenGL drawing.  
-bool drawModeEnabled = false;
+bool drawModeEnabled = true;
 
 bool P3F_scene = false; //choose between P3F scene or a built-in random scene
 
@@ -500,15 +500,13 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 
 	Color color = Color();
 	int num_lights = scene->getNumLights();
-	Vector normal_at_hp = closest_obj->getNormal(closest_hp);
+	Vector normal = closest_obj->getNormal(closest_hp);
+	
+	bool inside = false;
 
-	Vector normal_to_use = normal_at_hp;
-	// if dot is negative, that means that we are inside the object -> let's use the symmetric normal.
-	if (normal_at_hp * ray.direction * (-1) < 0) {
-		normal_to_use = normal_at_hp * (-1); 
-	}
+	if (ray.direction * normal > 0) normal = normal * (-1), inside = true;
 
-	Vector biased_hp = closest_hp + normal_at_hp * EPSILON;
+	Vector biased_hp = closest_hp + normal * EPSILON;
 	Vector biased_dir_to_orig = (ray.origin - biased_hp).normalize();
 
 	// Any objects between the intersection and direct light? If so, they're in the shadow.
@@ -534,7 +532,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 
 		// FALTA ISTO: shadow_intensity += 1 / num_lights_per_light
 
-		if (perturbed_light_dir * normal_to_use > 0) {
+		if (perturbed_light_dir * normal > 0) {
 			Ray shadow_ray = Ray(biased_hp, perturbed_light_dir);
 
 			bool vis = true;
@@ -556,10 +554,10 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 				Vector halfway = (perturbed_light_dir + biased_dir_to_orig).normalize(); // l_dir + dir from biased_hp to ray origin
 
 				color += light->color * closest_obj->GetMaterial()->GetDiffColor() * closest_obj->GetMaterial()->GetDiffuse() *
-						max(perturbed_light_dir * normal_to_use, 0.0f); // diffuse component
+						max(perturbed_light_dir * normal, 0.0f); // diffuse component
 						
 				color += light->color * closest_obj->GetMaterial()->GetSpecColor() * closest_obj->GetMaterial()->GetSpecular() *
-						pow(max(halfway * normal_to_use, 0.0f), closest_obj->GetMaterial()->GetShine()); // specular component
+						pow(max(halfway * normal, 0.0f), closest_obj->GetMaterial()->GetShine()); // specular component
 			}
 		}
 	}
@@ -571,58 +569,46 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	// ---	RAY CASTING PART FINISHED	---
 	// ---	---------------------------	---
 	// ---	TIME FOR PROPER PHYSICS		---
-
-	// Calculate fresnel
-	float kr = 1;
-	if (closest_obj->GetMaterial()->GetTransmittance() > 0) {
-		if (ior_1 == 1) {
-			kr = fresnel(1.0f, closest_obj->GetMaterial()->GetRefrIndex(), biased_dir_to_orig, normal_to_use);
-		}
-		else {
-			kr = fresnel(ior_1, 1.0f, biased_dir_to_orig, normal_to_use);
-		}
-	}
 	
-	if (closest_obj->GetMaterial()->GetReflection() > 0) {
-		Vector v = biased_dir_to_orig;
-		Vector vn = normal_to_use * (v * normal_to_use); // this is the component of the ray direction that is perp to the surface
-		Vector v_to_vn = vn - v; // how much we will shift vn
+	if (closest_obj->GetMaterial()->GetReflection() > 0 || closest_obj->GetMaterial()->GetTransmittance() > 0) {
+		float ior = closest_obj->GetMaterial()->GetRefrIndex();
 
-		Vector ref_dir = (vn + v_to_vn).normalize();
-	
-		// !! roughness parameter for each object
-		Vector fuzzy_direction = (ref_dir + rnd_unit_sphere() * 0.0f).normalize();
-
-		if (fuzzy_direction * normal_to_use > 0) { // otherwise, there will be no reflection
-			Ray reflected_ray = Ray(biased_hp, fuzzy_direction);
-			Color refl_color = rayTracing(reflected_ray, depth + 1, ior_1);
-			color += refl_color * closest_obj->GetMaterial()->GetSpecColor() * kr;
-		}
-	}
-	
-	if (closest_obj->GetMaterial()->GetTransmittance() > 0) {
-		Vector v = biased_dir_to_orig;
-		Vector vn = normal_to_use * (v * normal_to_use);
-		Vector v_to_vn = vn - v;
-
-		float ior_2 = closest_obj->GetMaterial()->GetRefrIndex();
-	
-		float sin_i = v_to_vn.length();
+		Vector v = ray.direction * (-1);
+		Vector refl_dir = (normal * (v * normal) * 2 - v).normalize();
 		
-		float sin_t = sin_i;
-		// are we outside an object? if yes, then 1 / ior_2; otherwise, ior_1 / 1.
-		sin_t *= (ior_1 == 1.0f) ? (1 / ior_2) : ior_1; 
-		float cos_t = sqrt(1 - sin_t * sin_t);
-	
-		Vector t_parallel_dir = v_to_vn.normalize();
-		Vector refr_dir = (t_parallel_dir * sin_t - normal_to_use * cos_t).normalize();
-	
-		Ray refr_ray = Ray(biased_hp, refr_dir);
+		// !! roughness parameter for each object
+		Vector fuzzy_direction = (refl_dir + rnd_unit_sphere() * 0.0f).normalize();
 
-		// are we outside an object? if yes, change ior to object ior; otherwise, make ior = 1.
-		Color refr_color = (ior_1 == 1.0f) ? rayTracing(refr_ray, depth + 1, ior_2) : rayTracing(refr_ray, depth + 1, 1.0f); 
-	
-		color += refr_color * closest_obj->GetMaterial()->GetTransmittance() * (1 - kr);
+		Color refl_color;
+		if (fuzzy_direction * normal > 0) { // otherwise, there will be no reflection
+			Ray reflected_ray = Ray(closest_hp + normal * EPSILON, fuzzy_direction);
+			refl_color = rayTracing(reflected_ray, depth + 1, ior_1);
+		}
+
+		Color refr_color;
+		if (closest_obj->GetMaterial()->GetTransmittance() > 0) {
+			float eta_frac = (inside) ? ior : 1 / ior;
+
+			Vector v_n = normal * (v * normal);
+
+			Vector v_t = (v_n + ray.direction);
+			float sin_i = v_t.length();
+
+			float cos_t_squared = 1 - (eta_frac * eta_frac * sin_i * sin_i);
+
+			Vector refr_dir = v_t.normalize() * sqrt(1 - cos_t_squared) - normal * sqrt(cos_t_squared);
+			Ray refr_ray = Ray(closest_hp - normal * EPSILON, refr_dir);
+
+			refr_color = rayTracing(refr_ray, depth + 1, ior_1);
+		}
+
+		float kr = (inside) ? fresnel(ior, ior_1, ray.direction * (-1), normal) 
+							: fresnel(ior_1, ior, ray.direction * (-1), normal);
+
+		color += (
+				refl_color * kr +
+				refr_color * (1 - kr) * closest_obj->GetMaterial()->GetTransmittance()
+				);
 	}
 
 	return color;
