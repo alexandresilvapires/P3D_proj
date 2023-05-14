@@ -453,13 +453,13 @@ void setupGLUT(int argc, char* argv[])
 
 /////////////////////////////////////////////////////YOUR CODE HERE///////////////////////////////////////////////////////////////////////////////////////
 
-float fresnel(float ior_1, float ior_2, Vector dir, Vector normal) {
+float fresnel(float ior_1, float ior_2, Vector dir_to_origin, Vector n_to_surf) {
 	float r0 = pow(((ior_1 - ior_2) / (ior_1 + ior_2)), 2);
 
-	float cos = dir * normal;
+	float cos = dir_to_origin * n_to_surf;
 	if (ior_1 > ior_2) { // we need to use cos_t, instead of cos_i
-		Vector vn = normal * (dir * normal);
-		Vector v_to_vn = vn - dir;
+		Vector vn = n_to_surf * (dir_to_origin * n_to_surf);
+		Vector v_to_vn = vn - dir_to_origin;
 	
 		float sin_i = v_to_vn.length();
 	
@@ -508,7 +508,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		normal_to_use = normal_at_hp * (-1); 
 	}
 
-	Vector biased_hp = closest_hp + normal_to_use * EPSILON;
+	Vector biased_hp = closest_hp + normal_at_hp * EPSILON;
 	Vector biased_dir_to_orig = (ray.origin - biased_hp).normalize();
 
 	// Any objects between the intersection and direct light? If so, they're in the shadow.
@@ -594,7 +594,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		Vector fuzzy_direction = (ref_dir + rnd_unit_sphere() * 0.0f).normalize();
 
 		if (fuzzy_direction * normal_to_use > 0) { // otherwise, there will be no reflection
-			Ray reflected_ray = Ray(closest_hp, fuzzy_direction);
+			Ray reflected_ray = Ray(biased_hp, fuzzy_direction);
 			Color refl_color = rayTracing(reflected_ray, depth + 1, ior_1);
 			color += refl_color * closest_obj->GetMaterial()->GetSpecColor() * kr;
 		}
@@ -617,7 +617,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		Vector t_parallel_dir = v_to_vn.normalize();
 		Vector refr_dir = (t_parallel_dir * sin_t - normal_to_use * cos_t).normalize();
 	
-		Ray refr_ray = Ray(closest_hp, refr_dir);
+		Ray refr_ray = Ray(biased_hp, refr_dir);
 
 		// are we outside an object? if yes, change ior to object ior; otherwise, make ior = 1.
 		Color refr_color = (ior_1 == 1.0f) ? rayTracing(refr_ray, depth + 1, ior_2) : rayTracing(refr_ray, depth + 1, 1.0f); 
