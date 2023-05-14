@@ -503,11 +503,13 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	Vector normal_at_hp = closest_obj->getNormal(closest_hp);
 
 	Vector normal_to_use = normal_at_hp;
-	if (normal_at_hp * ray.direction > 0) {
-		normal_to_use = normal_at_hp * (-1); // if dot is negative, that means that we are inside the object -> let's use the symmetric normal.
+	// if dot is negative, that means that we are inside the object -> let's use the symmetric normal.
+	if (normal_at_hp * ray.direction * (-1) < 0) {
+		normal_to_use = normal_at_hp * (-1); 
 	}
 
 	Vector biased_hp = closest_hp + normal_to_use * EPSILON;
+	Vector biased_dir_to_orig = (ray.origin - biased_hp).normalize();
 
 	// Any objects between the intersection and direct light? If so, they're in the shadow.
 	for (int i = 0; i < num_lights; i++) {
@@ -551,7 +553,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 			}
 
 			if (vis) {
-				Vector halfway = (perturbed_light_dir - ray.direction).normalize(); // l_dir + dir from hp to ray origin (hence the -)
+				Vector halfway = (perturbed_light_dir + biased_dir_to_orig).normalize(); // l_dir + dir from biased_hp to ray origin
 
 				color += light->color * closest_obj->GetMaterial()->GetDiffColor() * closest_obj->GetMaterial()->GetDiffuse() *
 						max(perturbed_light_dir * normal_to_use, 0.0f); // diffuse component
@@ -574,15 +576,15 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	float kr = 1;
 	if (closest_obj->GetMaterial()->GetTransmittance() > 0) {
 		if (ior_1 == 1) {
-			kr = fresnel(1.0f, closest_obj->GetMaterial()->GetRefrIndex(), ray.direction * (-1), normal_to_use);
+			kr = fresnel(1.0f, closest_obj->GetMaterial()->GetRefrIndex(), biased_dir_to_orig, normal_to_use);
 		}
 		else {
-			kr = fresnel(ior_1, 1.0f, ray.direction * (-1), normal_to_use);
+			kr = fresnel(ior_1, 1.0f, biased_dir_to_orig, normal_to_use);
 		}
 	}
 	
 	if (closest_obj->GetMaterial()->GetReflection() > 0) {
-		Vector v = ray.direction * (-1);
+		Vector v = biased_dir_to_orig;
 		Vector vn = normal_to_use * (v * normal_to_use); // this is the component of the ray direction that is perp to the surface
 		Vector v_to_vn = vn - v; // how much we will shift vn
 
@@ -599,7 +601,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	}
 	
 	if (closest_obj->GetMaterial()->GetTransmittance() > 0) {
-		Vector v = ray.direction * (-1);
+		Vector v = biased_dir_to_orig;
 		Vector vn = normal_to_use * (v * normal_to_use);
 		Vector v_to_vn = vn - v;
 
