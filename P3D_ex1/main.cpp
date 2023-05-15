@@ -25,9 +25,9 @@
 #include "macros.h"
 
 //Enable OpenGL drawing.  
-bool drawModeEnabled = false;
+bool drawModeEnabled = true;
 
-bool P3F_scene = false; //choose between P3F scene or a built-in random scene
+bool P3F_scene = true; //choose between P3F scene or a built-in random scene
 
 #define MAX_DEPTH 4  //number of bounces
 
@@ -76,7 +76,7 @@ Scene* scene = NULL;
 
 Grid* grid_ptr = NULL;
 BVH* bvh_ptr = NULL;
-accelerator Accel_Struct = NONE;
+accelerator Accel_Struct = GRID_ACC; // CHANGE ACCELERATOR TYPE HERE. THE RANDOM SCENCE USES BVH BY DEFAULT.
 
 int RES_X, RES_Y;
 
@@ -767,8 +767,6 @@ void init_scene(void)
 	// Pixel buffer to be used in the Save Image function
 	img_Data = (uint8_t*)malloc(3 * RES_X*RES_Y * sizeof(uint8_t));
 	if (img_Data == NULL) exit(1);
-
-	Accel_Struct = scene->GetAccelStruct();   //Type of acceleration data structure
 
 	if (Accel_Struct == GRID_ACC) {
 		grid_ptr = new Grid();
