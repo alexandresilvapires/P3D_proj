@@ -482,18 +482,25 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	float min_dist = FLT_MAX;
 	int num_objs = scene->getNumObjects();
 
-	for (int i = 0; i < num_objs; i++) {
-		Object* obj = scene->getObject(i);
-		float dist = FLT_MAX;
+	accelerator accel = scene->GetAccelStruct();
 
-		if (obj->intercepts(ray, dist)) {
-			if (dist < min_dist) {
-				intersected = true;
-				closest_obj = obj;
-				min_dist = dist;
-				closest_hp = ray.origin + ray.direction * dist;
+	if (accel == NONE) {
+		for (int i = 0; i < num_objs; i++) {
+			Object* obj = scene->getObject(i);
+			float dist = FLT_MAX;
+
+			if (obj->intercepts(ray, dist)) {
+				if (dist < min_dist) {
+					intersected = true;
+					closest_obj = obj;
+					min_dist = dist;
+					closest_hp = ray.origin + ray.direction * dist;
+				}
 			}
 		}
+	}
+	else if (accel == GRID_ACC) {
+		intersected = grid_ptr->Traverse(ray, &closest_obj, closest_hp);
 	}
 
 	if (!intersected) return scene->GetBackgroundColor(); // Ray traveled to infinity and beyond
@@ -530,24 +537,29 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		Vector perturbed_light_pos = corner_point + a * rand_float() * 2 + b * rand_float() * 2;
 		Vector perturbed_light_dir = (perturbed_light_pos - biased_hp).normalize();
 
-		// FALTA ISTO: shadow_intensity += 1 / num_lights_per_light
-
 		if (perturbed_light_dir * normal > 0) {
-			Ray shadow_ray = Ray(biased_hp, perturbed_light_dir);
-
 			bool vis = true;
 
-			for (int t = 0; t < num_objs; t++) {
-				Object* obj = scene->getObject(t);
-				float dist = 0;
+			if (accel == NONE) {
+				Ray shadow_ray = Ray(biased_hp, perturbed_light_dir);
 
-				if (obj->intercepts(shadow_ray, dist)) {
-					// if the object hit by the shadow feeler is *behind* the light source, it shouldn't be considered
-					if (dist < (perturbed_light_pos - biased_hp).length()) {
-						vis = false;
-						break;
+				for (int t = 0; t < num_objs; t++) {
+					Object* obj = scene->getObject(t);
+					float dist = 0;
+
+					if (obj->intercepts(shadow_ray, dist)) {
+						// if the object hit by the shadow feeler is *behind* the light source, it shouldn't be considered
+						if (dist < (perturbed_light_pos - biased_hp).length()) {
+							vis = false;
+							break;
+						}
 					}
 				}
+			}
+			else if (accel == GRID_ACC) {
+				Ray shadow_ray = Ray(biased_hp, perturbed_light_pos - biased_hp);
+
+				vis = !grid_ptr->Traverse(shadow_ray);
 			}
 
 			if (vis) {
@@ -734,6 +746,7 @@ void init_scene(void)
 	char scene_name[70];
 
 	scene = new Scene();
+	scene->SetAccelStruct(Accel_Struct);
 
 	if (P3F_scene) {  //Loading a P3F scene
 
