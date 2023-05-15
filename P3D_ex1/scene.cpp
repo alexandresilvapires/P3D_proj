@@ -13,8 +13,10 @@ Triangle::Triangle(Vector& P0, Vector& P1, Vector& P2)
 	points[0] = P0; points[1] = P1; points[2] = P2;
 
 	/* Calculate the normal */
-	normal = Vector(0, 0, 0);
-	normal.normalize();
+	Vector p0p1 = P1 - P0;
+	Vector p0p2 = P2 - P0;
+
+	normal = (p0p1 % p0p2).normalize();
 
 	//YOUR CODE to Calculate the Min and Max for bounding box
 	double max_x = -FLT_MAX, max_y = -FLT_MAX, max_z = -FLT_MAX;
@@ -32,14 +34,13 @@ Triangle::Triangle(Vector& P0, Vector& P1, Vector& P2)
 	Min = Vector(min_x, min_y, min_z);
 	Max = Vector(max_x, max_y, max_z);
 
-
 	// enlarge the bounding box a bit just in case...
 	Min -= EPSILON;
 	Max += EPSILON;
 }
 
 AABB Triangle::GetBoundingBox() {
-	return(AABB(Min, Max));
+	return AABB(Min, Max);
 }
 
 Vector Triangle::getNormal(Vector point)
@@ -55,21 +56,15 @@ bool Triangle::intercepts(Ray& r, float& t ) {
 
 	// Adapted from https://scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/ray-triangle-intersection-geometric-solution.html 
 
-	// Start by computing the plane's normal to see where it intersects the plane
-	Vector p0p1 = points[1] - points[0];
-	Vector p0p2 = points[2] - points[0];
-
-	Vector N = p0p1.operator%(p0p2); // N
-
 	// Check if ray and plane are (almost) parallel. If so, they don't intercept
-	float parallel_check = N.operator*(r.direction);
+	float parallel_check = normal * r.direction;
 	if (fabs(parallel_check) < 0.00001) return false; // TODO: Define threshold
 
 	// Calculate distance to origin
-	float d = -N.operator*(points[0]);
+	float d = -(normal* points[0]);
 
 	// Calculate t for intersection point
-	t = -(N.operator*(r.origin) + d) / parallel_check;
+	t = -(normal * r.origin + d) / parallel_check;
 
 	// If the point is behind the triangle (negative distance needed to hit) no intersection
 	if (t < 0) return false; // the triangle is behind
@@ -79,22 +74,22 @@ bool Triangle::intercepts(Ray& r, float& t ) {
 	Vector vector_check; // vector perpendicular to triangle's plane
 
 	// edge 0
-	Vector edge0 = p0p1;
+	Vector edge0 = points[1] - points[0];
 	Vector vp0 = intersect_point - points[0];
 	vector_check = edge0.operator%(vp0);
-	if (N.operator*(vector_check) < 0) return false; // P is on the right side
+	if (normal * vector_check < 0) return false; // P is on the right side
 
 	// edge 1
 	Vector edge1 = points[2] - points[1];
 	Vector vp1 = intersect_point - points[1];
 	vector_check = edge1.operator%(vp1);
-	if (N.operator*(vector_check) < 0)  return false; // P is on the right side
+	if (normal * vector_check < 0)  return false; // P is on the right side
 
 	// edge 2
 	Vector edge2 = points[0] - points[2];
 	Vector vp2 = intersect_point - points[2];
 	vector_check = edge2.operator%(vp2);
-	if (N.operator*(vector_check) < 0) return false; // P is on the right side;
+	if (normal * vector_check < 0) return false; // P is on the right side;
 
 	return true; // this ray hits the triangle
 }
@@ -186,8 +181,18 @@ AABB Sphere::GetBoundingBox() {
 	Vector a_min;
 	Vector a_max;
 
-	//PUT HERE YOUR CODE
-	return(AABB(a_min, a_max));
+	a_min.x = min(center.x - radius, center.x + radius);
+	a_min.y = min(center.y - radius, center.y + radius);
+	a_min.z = min(center.z - radius, center.z + radius);
+
+	a_max.x = max(center.x - radius, center.x + radius);
+	a_max.y = max(center.y - radius, center.y + radius);
+	a_max.z = max(center.z - radius, center.z + radius);
+
+	a_min += EPSILON;
+	a_max += EPSILON;
+
+	return AABB(a_min, a_max);
 }
 
 aaBox::aaBox(Vector& minPoint, Vector& maxPoint) //Axis aligned Box: another geometric object
@@ -197,7 +202,7 @@ aaBox::aaBox(Vector& minPoint, Vector& maxPoint) //Axis aligned Box: another geo
 }
 
 AABB aaBox::GetBoundingBox() {
-	return(AABB(min, max));
+	return AABB(min, max);
 }
 
 bool aaBox::intercepts(Ray& ray, float& t)
