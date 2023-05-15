@@ -25,7 +25,7 @@
 #include "macros.h"
 
 //Enable OpenGL drawing.  
-bool drawModeEnabled = true;
+bool drawModeEnabled = false;
 
 bool P3F_scene = false; //choose between P3F scene or a built-in random scene
 
@@ -600,15 +600,18 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 			Ray refr_ray = Ray(closest_hp - normal * EPSILON, refr_dir);
 
 			refr_color = rayTracing(refr_ray, depth + 1, ior_1);
+			
+			float kr = (inside) ? fresnel(ior, ior_1, ray.direction * (-1), normal) 
+								: fresnel(ior_1, ior, ray.direction * (-1), normal);
+
+			color += (
+					refl_color * kr +
+					refr_color * (1 - kr) * closest_obj->GetMaterial()->GetTransmittance()
+					);
 		}
-
-		float kr = (inside) ? fresnel(ior, ior_1, ray.direction * (-1), normal) 
-							: fresnel(ior_1, ior, ray.direction * (-1), normal);
-
-		color += (
-				refl_color * kr +
-				refr_color * (1 - kr) * closest_obj->GetMaterial()->GetTransmittance()
-				);
+		else {
+			color += refl_color * closest_obj->GetMaterial()->GetSpecColor() * closest_obj->GetMaterial()->GetSpecular();
+		}
 	}
 
 	return color;
@@ -623,6 +626,8 @@ void renderScene()
 	int index_pos = 0;
 	int index_col = 0;
 	unsigned int counter = 0;
+
+	set_rand_seed(time(NULL) * time(NULL));
 
 	if (drawModeEnabled) {
 		glClear(GL_COLOR_BUFFER_BIT);
