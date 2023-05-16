@@ -64,7 +64,7 @@ void BVH::build_recursive(int left_index, int right_index, BVHNode *node) {
 
 	if (right_index - left_index <= 2) {
 		BVHNode* n = new BVHNode();
-		n->MakeLeaf(left_index, right_index - left_index + 1);
+		n->makeLeaf(left_index, right_index - left_index + 1);
 
 	}
 	else {
@@ -79,21 +79,21 @@ void BVH::build_recursive(int left_index, int right_index, BVHNode *node) {
 		if (size_y >= size_x && size_y >= size_z) cmp.sort_dim = 1;
 		else if (size_z >= size_x && size_z >= size_y) cmp.sort_dim = 1;
 
-		std::sort(node->objs.begin() + left_index, node->objs.begin() + right_index, cmp); // TODO access objects
+		//std::sort(getObjs().begin() + left_index, getObjs().begin() + right_index, cmp); // TODO access objects
 
 		//TODO find split index
-		int split_index = node->objs.size() / 2;
+		int split_index = (left_index + right_index) / 2;
 
 
 		// Calculate bounding boxes of left and right sides
-		AABB left_bb = node->objs[0]->GetBoundingBox();
-		for (int i = 1; i < split_index; i++) {
-			left_bb.extend(node->objs[i]->GetBoundingBox());
+		AABB left_bb = getObjs()[left_index]->GetBoundingBox();
+		for (int i = left_index+1; i < split_index; i++) {
+			left_bb.extend(getObjs()[i]->GetBoundingBox());
 		}
 
-		AABB right_bb = node->objs[split_index]->GetBoundingBox();
+		AABB right_bb = getObjs()[split_index]->GetBoundingBox();
 		for (int i = split_index; i < right_index; i++) {
-			right_bb.extend(node->objs[i]->GetBoundingBox());
+			right_bb.extend(getObjs()[i]->GetBoundingBox());
 		}
 
 		// Create two new nodes, leftNode and rightNode and assign bounding boxes
@@ -105,14 +105,14 @@ void BVH::build_recursive(int left_index, int right_index, BVHNode *node) {
 
 		// Initiate current node as an interior node with leftNode and rightNode as children:
 		node->makeNode(nodes.size());
-		node->index = left_node->index;
+		node->setIndex(left_node->getIndex());
 
 		// Push back leftNode and rightNode into nodes vector
 		nodes.push_back(left_node);
 		nodes.push_back(right_node);
 
-		build_recursive(left_index, split_index, left_node)
-		build_recursive(split_index, right_index, right_node)
+		build_recursive(left_index, split_index, left_node);
+		build_recursive(split_index, right_index, right_node);
 	}
 			
 		
@@ -125,18 +125,18 @@ bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
 
 			BVHNode* currentNode = nodes[0];
 
-			bool hit_world = currentNode->bbox.intersects(ray, tmin);
+			bool hit_world = currentNode->getAABB().intercepts(ray, tmin);
 
 			if (hit_world == false) return false;
 
 			while (true) {
-				if (!currentNode->leaf) {
+				if (!currentNode->isLeaf()) {
 					// Case for not in leaf
-					BVHNode* left = nodes[currentNode->index];
-					BVHNode* right = nodes[currentNode->index + 1];
+					BVHNode* left = nodes[currentNode->getIndex()];
+					BVHNode* right = nodes[currentNode->getIndex() + 1];
 
-					bool hit_left = left->bbox.intersects(ray, tmp1);
-					bool hit_right = right->bbox.intersects(ray, tmp2);
+					bool hit_left = left->getAABB().intercepts(ray, tmp1);
+					bool hit_right = right->getAABB().intercepts(ray, tmp2);
 
 					if (hit_left && hit_right) {
 						// Both hit: furthest one goes to the stack, current node is now the closest
@@ -159,28 +159,29 @@ bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
 				}
 				else {
 					// Case for leaf
-					for (int i = 0; i <= currentNode->n_objs; i++) {
-						Object* o = currentNode->objects[i];
+					for (int i = 0; i <= currentNode->getNObjs(); i++) {
+						Object* o = getObjs()[currentNode->getIndex() + i];
 
-						bool has_hit = o->intersects(ray, tmp1);
+						bool has_hit = o->intercepts(ray, tmp1);
 
 						if (has_hit) {
 							if (tmp1 < tmin) {
 								tmin = tmp1;
-								&hit_obj = o;
+								hit_obj = &o;
 								hit = true;
 							}
 						}
 					}
 				}
-				while (!stack.empty()) {
-					StackItem st = hit_stack.pop();
+				while (!hit_stack.empty()) {
+					StackItem st = hit_stack.top();
+					hit_stack.pop();
 					if (st.t < tmin) {
 						currentNode = st.ptr;
 					}
 				}
-				if (stack.empty()) {
-					&hit_point = ray.origin + ray.direction * tmin;
+				if (hit_stack.empty()) {
+					hit_point = ray.origin + ray.direction * tmin;
 					return hit == true;
 				}
 			}
@@ -201,18 +202,18 @@ bool BVH::Traverse(Ray& ray) {  //shadow ray with length
 
 			BVHNode* currentNode = nodes[0];
 
-			bool hit_world = currentNode->bbox.intersects(ray, tmin);
+			bool hit_world = currentNode->getAABB().intercepts(ray, tmin);
 
 			if (hit_world == false) return false;
 
 			while (true) {
-				if (!currentNode->leaf) {
+				if (!currentNode->isLeaf()) {
 					// Case for not in leaf
-					BVHNode* left = nodes[currentNode->index];
-					BVHNode* right = nodes[currentNode->index + 1];
+					BVHNode* left = nodes[currentNode->getIndex()];
+					BVHNode* right = nodes[currentNode->getIndex() + 1];
 
-					bool hit_left = left->bbox.intersects(ray, tmp1);
-					bool hit_right = right->bbox.intersects(ray, tmp2);
+					bool hit_left = left->getAABB().intercepts(ray, tmp1);
+					bool hit_right = right->getAABB().intercepts(ray, tmp2);
 
 					if (hit_left && hit_right) {
 						// Both hit: furthest one goes to the stack, current node is now the closest
@@ -229,21 +230,22 @@ bool BVH::Traverse(Ray& ray) {  //shadow ray with length
 				}
 				else {
 					// Case for leaf
-					for (int i = 0; i <= currentNode->n_objs; i++) {
-						Object* o = currentNode->objects[i];
+					for (int i = 0; i <= currentNode->getNObjs(); i++) {
+						Object* o = getObjs()[currentNode->getIndex()+i];
 
-						bool has_hit = o->intersects(ray, tmp1);
+						bool has_hit = o->intercepts(ray, tmp1);
 
 						if (has_hit) {
 							return true;
 						}
 					}
 				}
-				if (stack.empty()) {
+				if (hit_stack.empty()) {
 					return false;
 				}
 				else {
-					StackItem st = hit_stack.pop();
+					StackItem st = hit_stack.top();
+					hit_stack.pop();
 					currentNode = st.ptr;
 				}
 			}
