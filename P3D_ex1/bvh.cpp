@@ -57,6 +57,32 @@ void BVH::Build(vector<Object *> &objs) {
 			build_recursive(0, objects.size(), root); // -> root node takes all the 
 		}
 
+int get_largest_dim(vector<Object*> objs) {
+	float min_x = FLT_MAX;
+	float max_x = FLT_MIN;
+	float min_y = FLT_MAX;
+	float max_y = FLT_MIN;
+	float min_z = FLT_MAX;
+	float max_z = FLT_MIN;
+
+	for (Object* o : objs) {
+		Vector c = o.GetBoundingBox().centroid();
+		if (min_x > c.x) min_x = c.x;
+		if (max_x < c.x) max_x = c.x;
+		if (min_y > c.y) min_y = c.y;
+		if (max_y < c.y) max_y = c.y;
+		if (min_z > c.z) min_z = c.z;
+		if (max_z < c.z) max_z = c.z;
+	}
+	float x_interval = max_x - min_x;
+	float y_interval = max_y - min_y;
+	float z_interval = max_z - min_z;
+
+	if (x_interval >= y_interval && x_interval >= z_interval) return 0;
+	else if (y_interval >= x_interval && y_interval >= z_interval) return 1;
+	else return 2;
+}
+
 void BVH::build_recursive(int left_index, int right_index, BVHNode *node) {
 		//right_index, left_index and split_index refer to the indices in the objects vector
 	   // do not confuse with left_nodde_index and right_node_index which refer to indices in the nodes vector. 
