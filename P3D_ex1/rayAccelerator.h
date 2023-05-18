@@ -83,6 +83,7 @@ private:
 	stack<StackItem> hit_stack;
 
 	int get_split_index(int left_index, int right_index, BVHNode* parent);
+	int get_largest_dim(int left_index, int right_index);
 
 public:
 	BVH(void);

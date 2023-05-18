@@ -68,7 +68,7 @@ int BVH::get_split_index(int left_index, int right_index, BVHNode *parent) {
 	return (c_min < total_objs) ? c_min : -1;
 }
 
-int get_largest_dim(vector<Object*> objs) {
+int BVH::get_largest_dim(int left_index, int right_index) {
 	float min_x = FLT_MAX;
 	float max_x = FLT_MIN;
 	float min_y = FLT_MAX;
@@ -76,8 +76,10 @@ int get_largest_dim(vector<Object*> objs) {
 	float min_z = FLT_MAX;
 	float max_z = FLT_MIN;
 
-	for (Object* o : objs) {
-		Vector c = o.GetBoundingBox().centroid();
+	for (int i = left_index; i < right_index; i++) {
+		Object* o = objects[i];
+		Vector c = o->GetBoundingBox().centroid();
+
 		if (min_x > c.x) min_x = c.x;
 		if (max_x < c.x) max_x = c.x;
 		if (min_y > c.y) min_y = c.y;
@@ -107,7 +109,7 @@ void BVH::build_recursive(int left_index, int right_index, BVHNode *node) {
 		// Find shortest dimension in AABB and use it to compare objects
 		BVH::Comparator cmp;
 
-		cmp.sort_dim = 0;
+		cmp.sort_dim = get_largest_dim(left_index, right_index);
 		std::sort(objects.begin() + left_index, objects.begin() + right_index, cmp);
 
 		int split_index = get_split_index(left_index, right_index, node);
