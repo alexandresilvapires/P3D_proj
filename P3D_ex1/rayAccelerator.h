@@ -60,6 +60,7 @@ class BVH
 	public:
 		BVHNode(void);
 		void setAABB(AABB& bbox_);
+		void setIndex(unsigned int index_) { index = index_; } //TODO: Check if needed
 		void makeLeaf(unsigned int index_, unsigned int n_objs_);
 		void makeNode(unsigned int left_index_);
 		bool isLeaf() { return leaf; }
@@ -84,6 +85,7 @@ private:
 public:
 	BVH(void);
 	int getNumObjects();
+	vector<Object*> getObjs() { return objects; } //TODO: Check if needed
 	
 	void Build(vector<Object*>& objects);
 	void build_recursive(int left_index, int right_index, BVHNode* node);
