@@ -168,7 +168,7 @@ bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
 							if (tmp1 < tmin) {
 								tmin = tmp1;
 								hit_obj = &o;
-								hit = true;
+								hit = true; // Se calhar está errado
 							}
 						}
 					}
