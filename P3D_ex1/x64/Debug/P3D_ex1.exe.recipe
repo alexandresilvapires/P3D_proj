@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>C:\Users\jfons\Documents\P3D_proj\x64\Debug\P3D_ex1.exe</FullPath>
+      <FullPath>\\wsl.localhost\Ubuntu\home\alexpires\Desktop\P3D_proj\x64\Debug\P3D_ex1.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />
