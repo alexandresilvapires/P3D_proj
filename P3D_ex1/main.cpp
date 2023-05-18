@@ -25,9 +25,9 @@
 #include "macros.h"
 
 //Enable OpenGL drawing.  
-bool drawModeEnabled = false;
+bool drawModeEnabled = true;
 
-bool P3F_scene = false; //choose between P3F scene or a built-in random scene
+bool P3F_scene = true; //choose between P3F scene or a built-in random scene
 
 #define MAX_DEPTH 4  //number of bounces
 
@@ -76,15 +76,13 @@ Scene* scene = NULL;
 
 Grid* grid_ptr = NULL;
 BVH* bvh_ptr = NULL;
-accelerator Accel_Struct = NONE;
+accelerator Accel_Struct = GRID_ACC; // CHANGE ACCELERATOR TYPE HERE. THE RANDOM SCENCE USES BVH BY DEFAULT.
 
 int RES_X, RES_Y;
 
 int WindowHandle = 0;
 
 int AA_sample_size = 2;
-
-
 
 /////////////////////////////////////////////////////////////////////// ERRORS
 
@@ -455,18 +453,28 @@ void setupGLUT(int argc, char* argv[])
 
 /////////////////////////////////////////////////////YOUR CODE HERE///////////////////////////////////////////////////////////////////////////////////////
 
-float fresnel(float ior_1, float ior_2, Vector dir, Vector normal) {
-	float ro = pow(((ior_1 - ior_2) / (ior_1 + ior_2)), 2);
+float fresnel(float ior_1, float ior_2, Vector dir_to_origin, Vector n_to_surf) {
+	float r0 = pow(((ior_1 - ior_2) / (ior_1 + ior_2)), 2);
 
-	float cos = dir * normal; // cos 0 = v1 . v2 / (|v1| + |v2|) but dir and normal are normalized
+	float cos = dir_to_origin * n_to_surf;
+	if (ior_1 > ior_2) { // we need to use cos_t, instead of cos_i
+		Vector vn = n_to_surf * (dir_to_origin * n_to_surf);
+		Vector v_to_vn = vn - dir_to_origin;
+	
+		float sin_i = v_to_vn.length();
+	
+		float sin_t = sin_i * ior_1; // we are inside
+		cos = sqrt(1 - sin_t * sin_t);
+	}
 
-	return ro + (1 - ro) * pow((1 - cos), 5);
+	return r0 + (1 - r0) * pow((1 - cos), 5);
 }
 
 Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medium 1 where the ray is travelling
 {
 	// --- RAY CASTING PART ---
 	// intersect ray with all objects and find a hit point (if any) closest to the start of the ray
+
 	bool intersected = false;
 	Object* closest_obj = nullptr;
 	Vector closest_hp;
@@ -474,34 +482,39 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	float min_dist = FLT_MAX;
 	int num_objs = scene->getNumObjects();
 
-	for (int i = 0; i < num_objs; i++) {
-		Object* obj = scene->getObject(i);
-		float dist = FLT_MAX;
+	accelerator accel = scene->GetAccelStruct();
 
-		if (obj->intercepts(ray, dist)) {
-			if (dist < min_dist) {
-				intersected = true;
-				closest_obj = obj;
-				min_dist = dist;
-				closest_hp = ray.origin + ray.direction * dist;
+	if (accel == NONE) {
+		for (int i = 0; i < num_objs; i++) {
+			Object* obj = scene->getObject(i);
+			float dist = FLT_MAX;
+
+			if (obj->intercepts(ray, dist)) {
+				if (dist < min_dist) {
+					intersected = true;
+					closest_obj = obj;
+					min_dist = dist;
+					closest_hp = ray.origin + ray.direction * dist;
+				}
 			}
 		}
+	}
+	else if (accel == GRID_ACC) {
+		intersected = grid_ptr->Traverse(ray, &closest_obj, closest_hp);
 	}
 
 	if (!intersected) return scene->GetBackgroundColor(); // Ray traveled to infinity and beyond
 
 	Color color = Color();
 	int num_lights = scene->getNumLights();
-	Vector normal_at_hp = closest_obj->getNormal(closest_hp);
+	Vector normal = closest_obj->getNormal(closest_hp);
+	
+	bool inside = false;
 
-	Vector normal_to_use = normal_at_hp;
-	if (normal_at_hp * ray.direction > 0) {
-		normal_to_use = normal_at_hp * (-1); // if dot is negative, that means that we are inside the object -> let's use the symmetric normal.
-	}
+	if (ray.direction * normal > 0) normal = normal * (-1), inside = true;
 
-	Vector biased_hp = closest_hp + normal_to_use * EPSILON;
-
-	int num_lights_per_light = 1; // for soft shadows
+	Vector biased_hp = closest_hp + normal * EPSILON;
+	Vector biased_dir_to_orig = (ray.origin - biased_hp).normalize();
 
 	// Any objects between the intersection and direct light? If so, they're in the shadow.
 	for (int i = 0; i < num_lights; i++) {
@@ -524,19 +537,17 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		Vector perturbed_light_pos = corner_point + a * rand_float() * 2 + b * rand_float() * 2;
 		Vector perturbed_light_dir = (perturbed_light_pos - biased_hp).normalize();
 
-		// FALTA ISTO: shadow_intensity += 1 / num_lights_per_light
+		if (perturbed_light_dir * normal > 0) {
+			bool vis = true;
 
-			if (light_dir * normal_to_use > 0) {
-				Ray shadow_ray = Ray(biased_hp, light_dir);
-
-				bool vis = true;
+			if (accel == NONE) {
+				Ray shadow_ray = Ray(biased_hp, perturbed_light_dir);
 
 				for (int t = 0; t < num_objs; t++) {
 					Object* obj = scene->getObject(t);
 					float dist = 0;
 
-					bool hits_obj = obj->intercepts(shadow_ray, dist);
-					if (hits_obj) {
+					if (obj->intercepts(shadow_ray, dist)) {
 						// if the object hit by the shadow feeler is *behind* the light source, it shouldn't be considered
 						if (dist < (perturbed_light_pos - biased_hp).length()) {
 							vis = false;
@@ -544,84 +555,78 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 						}
 					}
 				}
-				if (vis) {
-					Vector halfway = (perturbed_light_dir - ray.direction).normalize();
-
-					color +=
-						((light->color * closest_obj->GetMaterial()->GetDiffColor()) * closest_obj->GetMaterial()->GetDiffuse() *
-							max(perturbed_light_dir * normal_to_use, 0.0)) +
-						((light->color * closest_obj->GetMaterial()->GetSpecColor()) * closest_obj->GetMaterial()->GetSpecular() *
-							pow(max(halfway * normal_to_use, 0), closest_obj->GetMaterial()->GetShine())).clamp();
-				}
-				color = color.clamp();
 			}
+			else if (accel == GRID_ACC) {
+				Ray shadow_ray = Ray(biased_hp, perturbed_light_pos - biased_hp);
+
+				vis = !grid_ptr->Traverse(shadow_ray);
+			}
+
+			if (vis) {
+				Vector halfway = (perturbed_light_dir + biased_dir_to_orig).normalize(); // l_dir + dir from biased_hp to ray origin
+
+				color += light->color * closest_obj->GetMaterial()->GetDiffColor() * closest_obj->GetMaterial()->GetDiffuse() *
+						max(perturbed_light_dir * normal, 0.0f); // diffuse component
+						
+				color += light->color * closest_obj->GetMaterial()->GetSpecColor() * closest_obj->GetMaterial()->GetSpecular() *
+						pow(max(halfway * normal, 0.0f), closest_obj->GetMaterial()->GetShine()); // specular component
+			}
+		}
+	}
+
+	if (depth >= MAX_DEPTH) {
+		return color;
 	}
 
 	// ---	RAY CASTING PART FINISHED	---
 	// ---	---------------------------	---
 	// ---	TIME FOR PROPER PHYSICS		---
+	
+	if (closest_obj->GetMaterial()->GetReflection() > 0 || closest_obj->GetMaterial()->GetTransmittance() > 0) {
+		float ior = closest_obj->GetMaterial()->GetRefrIndex();
 
-	if (depth >= MAX_DEPTH) {
-		return color.clamp();
-	}
-	// Calculate fresnel
-	float kr = 1;
-	if (closest_obj->GetMaterial()->GetTransmittance() > 0) {
-		if (ior_1 == 1) {
-			kr = fresnel(1, closest_obj->GetMaterial()->GetRefrIndex(), ray.direction, normal_to_use);
-		}
-		else{
-			kr = fresnel(closest_obj->GetMaterial()->GetRefrIndex(),1, ray.direction, normal_to_use);
-		}
-	}
-	
-	if (closest_obj->GetMaterial()->GetReflection() > 0) {
-		Vector v_vector = ray.origin - biased_hp;
-		Vector ref_dir = (normal_to_use * (v_vector * normal_to_use) * 2 - v_vector).normalize();
-	
-		// !! we were supposed to use a roughness parameter, but it is missing
-		Vector fuzzy_direction = (ref_dir + rnd_unit_sphere() * 0.1f).normalize();
+		Vector v = ray.direction * (-1);
+		Vector refl_dir = (normal * (v * normal) * 2 - v).normalize();
+		
+		// !! roughness parameter for each object
+		Vector fuzzy_direction = (refl_dir + rnd_unit_sphere() * 0.0f).normalize();
 
-		Ray reflected_ray = Ray(biased_hp, fuzzy_direction);
-		if (fuzzy_direction * normal_to_use > 0) { // otherwise, the ray is hitting at 90º (not sure about this if)
-			Color refl_color = rayTracing(reflected_ray, depth + 1, ior_1);
-			color += refl_color * kr * closest_obj->GetMaterial()->GetSpecColor();
-			color = color.clamp();
+		Color refl_color;
+		if (fuzzy_direction * normal > 0) { // otherwise, there will be no reflection
+			Ray reflected_ray = Ray(closest_hp + normal * EPSILON, fuzzy_direction);
+			refl_color = rayTracing(reflected_ray, depth + 1, ior_1);
 		}
-	}
-	
-	if (closest_obj->GetMaterial()->GetRefrIndex() > 0 && kr != 1) {
-		Vector v_hat = ray.direction * (-1.0);
-		Vector v_t = normal_to_use * (v_hat * normal_to_use) - v_hat;
-	
-		float sin_i = v_t.length();
-		float sin_t;
-		if (ior_1 != 1) {
-			sin_t = ior_1 * sin_i;
-		}
-		else {
-			sin_t = (ior_1 / closest_obj->GetMaterial()->GetRefrIndex()) * sin_i;
-		}
-		float cos_t = sqrt(1 - sin_t * sin_t);
-	
-		Vector t_hat = v_t.normalize();
-	
-		Vector refr_dir = (t_hat * sin_t - normal_to_use * cos_t).normalize();
-	
-		Ray refr_ray = Ray(biased_hp, refr_dir);
 
 		Color refr_color;
-		if (ior_1 != 1) {
-			refr_color = rayTracing(refr_ray, depth + 1, 1);
+		if (closest_obj->GetMaterial()->GetTransmittance() > 0) {
+			float eta_frac = (inside) ? ior : 1 / ior;
+
+			Vector v_n = normal * (v * normal);
+
+			Vector v_t = (v_n + ray.direction);
+			float sin_i = v_t.length();
+
+			float cos_t_squared = 1 - (eta_frac * eta_frac * sin_i * sin_i);
+
+			Vector refr_dir = v_t.normalize() * sqrt(1 - cos_t_squared) - normal * sqrt(cos_t_squared);
+			Ray refr_ray = Ray(closest_hp - normal * EPSILON, refr_dir);
+
+			refr_color = rayTracing(refr_ray, depth + 1, ior_1);
+			
+			float kr = (inside) ? fresnel(ior, ior_1, ray.direction * (-1), normal) 
+								: fresnel(ior_1, ior, ray.direction * (-1), normal);
+
+			color += (
+					refl_color * kr +
+					refr_color * (1 - kr) * closest_obj->GetMaterial()->GetTransmittance()
+					);
 		}
 		else {
-			refr_color = rayTracing(refr_ray, depth + 1, closest_obj->GetMaterial()->GetRefrIndex());
+			color += refl_color * closest_obj->GetMaterial()->GetSpecColor() * closest_obj->GetMaterial()->GetSpecular();
 		}
-	
-		color += refr_color * closest_obj->GetMaterial()->GetDiffColor() * (1 - kr);// *closest_obj->GetMaterial()->GetTransmittance();
-		color = color.clamp();
 	}
-	return color.clamp();
+
+	return color;
 }
 
 
@@ -633,6 +638,8 @@ void renderScene()
 	int index_pos = 0;
 	int index_col = 0;
 	unsigned int counter = 0;
+
+	set_rand_seed(time(NULL) * time(NULL));
 
 	if (drawModeEnabled) {
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -656,11 +663,9 @@ void renderScene()
 
 					lens_sample = rnd_unit_disk() * scene->GetCamera()->GetAperture(); // random coords in unit disc
 
-					Ray ray = scene->GetCamera()->PrimaryRay(pixel);   //function from camera.h
+					Ray ray = scene->GetCamera()->PrimaryRay(lens_sample, pixel);   //function from camera.h
 
-					Color newColor = rayTracing(ray, 1, 1.0);
-
-					color += newColor;
+					color += rayTracing(ray, 1, 1.0).clamp();
 				}
 			}
 
@@ -741,6 +746,7 @@ void init_scene(void)
 	char scene_name[70];
 
 	scene = new Scene();
+	scene->SetAccelStruct(Accel_Struct);
 
 	if (P3F_scene) {  //Loading a P3F scene
 
@@ -774,8 +780,6 @@ void init_scene(void)
 	// Pixel buffer to be used in the Save Image function
 	img_Data = (uint8_t*)malloc(3 * RES_X*RES_Y * sizeof(uint8_t));
 	if (img_Data == NULL) exit(1);
-
-	Accel_Struct = scene->GetAccelStruct();   //Type of acceleration data structure
 
 	if (Accel_Struct == GRID_ACC) {
 		grid_ptr = new Grid();
