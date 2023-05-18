@@ -122,4 +122,16 @@ bool AABB::intercepts(const Ray& ray, float& t)
 
 	return (t0 < t1 && t1 > 0);
 }
+
+// --------------------------------------------------------------------- AABB surface area (XZ plane)
+float AABB::surface_area() {
+	float x_length = max.x - min.x;
+	float y_length = max.y - min.y;
+	float z_length = max.z - min.z;
+
+	return  2 * x_length * x_length +
+			2 * y_length * y_length +
+			2 * z_length * z_length;
+}
+
 #endif

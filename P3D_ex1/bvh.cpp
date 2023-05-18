@@ -5,16 +5,6 @@
 
 using namespace std;
 
-class ComparePrimitives {
-public:
-	bool operator() (Object* a, Object* b) {
-		float ca = a->GetBoundingBox().centroid().getAxisValue(sort_dim);
-		float cb = b->GetBoundingBox().centroid().getAxisValue(sort_dim);
-		return ca < cb;
-	}
-	int sort_dim;
-};
-
 BVH::BVHNode::BVHNode(void) {}
 
 void BVH::BVHNode::setAABB(AABB& bbox_) { this->bbox = bbox_; }
@@ -36,10 +26,7 @@ BVH::BVH(void) {}
 
 int BVH::getNumObjects() { return objects.size(); }
 
-
 void BVH::Build(vector<Object *> &objs) {
-
-		
 			BVHNode *root = new BVHNode();
 
 			Vector min = Vector(FLT_MAX, FLT_MAX, FLT_MAX), max = Vector(-FLT_MAX, -FLT_MAX, -FLT_MAX);
@@ -53,47 +40,62 @@ void BVH::Build(vector<Object *> &objs) {
 			world_bbox.min.x -= EPSILON; world_bbox.min.y -= EPSILON; world_bbox.min.z -= EPSILON;
 			world_bbox.max.x += EPSILON; world_bbox.max.y += EPSILON; world_bbox.max.z += EPSILON;
 			root->setAABB(world_bbox);
+			
 			nodes.push_back(root);
 			build_recursive(0, objects.size(), root); // -> root node takes all the 
-		}
+}
+
+int BVH::get_split_index(int left_index, int right_index, BVHNode *parent) {
+	int total_objs = right_index - left_index;
+	float parent_aabb_sa = parent->getAABB().surface_area();
+
+	float c_min = FLT_MAX;
+
+	for (int i = left_index; i < right_index; i++) {
+		int nr_objs_left_side = (i - left_index) + 1;
+		
+		float left_aabb_sa = objects[left_index]->GetBoundingBox().surface_area();
+		float right_aabb_sa = objects[right_index]->GetBoundingBox().surface_area();
+
+		// TODO: WHAT IS THE COST OF TRAVERSAL AND COST OF INTERSECTION?
+		float c = 1 +
+			(left_aabb_sa / parent_aabb_sa) * nr_objs_left_side +
+			(right_aabb_sa / parent_aabb_sa) * (total_objs - nr_objs_left_side);
+
+		if (c < c_min) c_min = c;
+	}
+
+	return (c_min < total_objs) ? c_min : -1;
+}
 
 void BVH::build_recursive(int left_index, int right_index, BVHNode *node) {
-		//right_index, left_index and split_index refer to the indices in the objects vector
-	   // do not confuse with left_nodde_index and right_node_index which refer to indices in the nodes vector. 
-	    // node.index can have a index of objects vector or a index of nodes vector
+	// right_index, left_index and split_index refer to the indices in the objects vector
+    // do not confuse with left_nodde_index and right_node_index which refer to indices in the nodes vector. 
+	// node.index can have a index of objects vector or a index of nodes vector
 
-	if (right_index - left_index <= 2) {
+	if (right_index - left_index <= Threshold) {
 		BVHNode* n = new BVHNode();
 		n->makeLeaf(left_index, right_index - left_index + 1);
-
 	}
 	else {
 		// Find shortest dimension in AABB and use it to compare objects
-		ComparePrimitives cmp = ComparePrimitives();
+		BVH::Comparator cmp;
 
-		// find shortest dim
-		float size_x = node->getAABB().max.x - node->getAABB().min.x;
-		float size_y = node->getAABB().max.y - node->getAABB().min.y;
-		float size_z = node->getAABB().max.z - node->getAABB().min.z;
+		cmp.sort_dim = 0;
+		std::sort(objects.begin() + left_index, objects.begin() + right_index, cmp);
 
-		if (size_y >= size_x && size_y >= size_z) cmp.sort_dim = 1;
-		else if (size_z >= size_x && size_z >= size_y) cmp.sort_dim = 1;
-
-		//std::sort(getObjs().begin() + left_index, getObjs().begin() + right_index, cmp); // TODO access objects
-
-		//TODO find split index
-		int split_index = (left_index + right_index) / 2;
-
+		int split_index = get_split_index(left_index, right_index, node);
+		if (split_index == -1) return; // not worth it to split anymore
 
 		// Calculate bounding boxes of left and right sides
-		AABB left_bb = getObjs()[left_index]->GetBoundingBox();
-		for (int i = left_index+1; i < split_index; i++) {
-			left_bb.extend(getObjs()[i]->GetBoundingBox());
+		AABB left_bb = objects[left_index]->GetBoundingBox();
+		for (int i = left_index + 1; i < split_index; i++) {
+			left_bb.extend(objects[i]->GetBoundingBox());
 		}
 
-		AABB right_bb = getObjs()[split_index]->GetBoundingBox();
+		AABB right_bb = objects[split_index]->GetBoundingBox();
 		for (int i = split_index; i < right_index; i++) {
-			right_bb.extend(getObjs()[i]->GetBoundingBox());
+			right_bb.extend(objects[i]->GetBoundingBox());
 		}
 
 		// Create two new nodes, leftNode and rightNode and assign bounding boxes
@@ -113,10 +115,8 @@ void BVH::build_recursive(int left_index, int right_index, BVHNode *node) {
 
 		build_recursive(left_index, split_index, left_node);
 		build_recursive(split_index, right_index, right_node);
-	}
-			
-		
-	}
+	}		
+}
 
 bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
 			float tmp1, tmp2;

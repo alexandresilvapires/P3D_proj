@@ -40,11 +40,11 @@ class BVH
 {
 	class Comparator {
 	public:
-		int dimension;
+		int sort_dim;
 
 		bool operator() (Object* a, Object* b) {
-			float ca = a->GetBoundingBox().centroid().getAxisValue(dimension);
-			float cb = b->GetBoundingBox().centroid().getAxisValue(dimension);
+			float ca = a->GetBoundingBox().centroid().getAxisValue(sort_dim);
+			float cb = b->GetBoundingBox().centroid().getAxisValue(sort_dim);
 			return ca < cb;
 		}
 	};
@@ -80,6 +80,8 @@ private:
 	};
 
 	stack<StackItem> hit_stack;
+
+	int get_split_index(int left_index, int right_index, BVHNode* parent);
 
 public:
 	BVH(void);

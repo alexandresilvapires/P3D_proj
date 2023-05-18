@@ -18,4 +18,5 @@ public:
 	Vector centroid(void);
 	void extend(AABB box);
 
+	float surface_area();
 };
