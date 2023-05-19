@@ -40,11 +40,11 @@ class BVH
 {
 	class Comparator {
 	public:
-		int dimension;
+		int sort_dim;
 
 		bool operator() (Object* a, Object* b) {
-			float ca = a->GetBoundingBox().centroid().getAxisValue(dimension);
-			float cb = b->GetBoundingBox().centroid().getAxisValue(dimension);
+			float ca = a->GetBoundingBox().centroid().getAxisValue(sort_dim);
+			float cb = b->GetBoundingBox().centroid().getAxisValue(sort_dim);
 			return ca < cb;
 		}
 	};
@@ -60,6 +60,7 @@ class BVH
 	public:
 		BVHNode(void);
 		void setAABB(AABB& bbox_);
+		void setIndex(unsigned int index_) { index = index_; }
 		void makeLeaf(unsigned int index_, unsigned int n_objs_);
 		void makeNode(unsigned int left_index_);
 		bool isLeaf() { return leaf; }
@@ -81,9 +82,13 @@ private:
 
 	stack<StackItem> hit_stack;
 
+	int get_split_index(int left_index, int right_index, BVHNode* parent);
+	int get_largest_dim(int left_index, int right_index);
+
 public:
 	BVH(void);
 	int getNumObjects();
+	vector<Object*> getObjs() { return objects; } //TODO: Check if needed
 	
 	void Build(vector<Object*>& objects);
 	void build_recursive(int left_index, int right_index, BVHNode* node);

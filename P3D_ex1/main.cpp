@@ -25,7 +25,7 @@
 #include "macros.h"
 
 //Enable OpenGL drawing.  
-bool drawModeEnabled = true;
+bool drawModeEnabled = false;
 
 bool P3F_scene = true; //choose between P3F scene or a built-in random scene
 
@@ -76,7 +76,7 @@ Scene* scene = NULL;
 
 Grid* grid_ptr = NULL;
 BVH* bvh_ptr = NULL;
-accelerator Accel_Struct = GRID_ACC; // CHANGE ACCELERATOR TYPE HERE. THE RANDOM SCENCE USES BVH BY DEFAULT.
+accelerator Accel_Struct = BVH_ACC; // CHANGE ACCELERATOR TYPE HERE. THE RANDOM SCENCE USES BVH BY DEFAULT.
 
 int RES_X, RES_Y;
 
@@ -502,6 +502,9 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	else if (accel == GRID_ACC) {
 		intersected = grid_ptr->Traverse(ray, &closest_obj, closest_hp);
 	}
+	else if (accel == BVH_ACC) {
+		intersected = bvh_ptr->Traverse(ray, &closest_obj, closest_hp);
+	}
 
 	if (!intersected) return scene->GetBackgroundColor(); // Ray traveled to infinity and beyond
 
@@ -560,6 +563,11 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 				Ray shadow_ray = Ray(biased_hp, perturbed_light_pos - biased_hp);
 
 				vis = !grid_ptr->Traverse(shadow_ray);
+			}
+			else if (accel == BVH_ACC) {
+				Ray shadow_ray = Ray(biased_hp, perturbed_light_pos - biased_hp);
+
+				vis = !bvh_ptr->Traverse(shadow_ray);
 			}
 
 			if (vis) {
@@ -789,17 +797,19 @@ void init_scene(void)
 		for (int o = 0; o < num_objects; o++) {
 			objs.push_back(scene->getObject(o));
 		}
+
 		grid_ptr->Build(objs);
 		printf("Grid built.\n\n");
 	}
 	else if (Accel_Struct == BVH_ACC) {
+		bvh_ptr = new BVH();
 		vector<Object*> objs;
 		int num_objects = scene->getNumObjects();
-		bvh_ptr = new BVH();
 
 		for (int o = 0; o < num_objects; o++) {
 			objs.push_back(scene->getObject(o));
 		}
+
 		bvh_ptr->Build(objs);
 		printf("BVH built.\n\n");
 	}
