@@ -276,15 +276,26 @@ Triangle createTriangle(vec3 v0, vec3 v1, vec3 v2)
 
 bool hit_triangle(Triangle t, Ray r, float tmin, float tmax, out HitRecord rec)
 {
-    //INSERT YOUR CODE HERE
-    //calculate a valid t and normal
-    if(t < tmax && t > tmin)
-    {
+    vec3 ab = t.b - t.a;
+    vec3 ac = t.c - t.a;
+    vec3 ao = r.o - t.a;
+    
+    vec3 normal = normalize(cross(ab, ac));
+    float t_plane = -(dot(ao, t_normal) / dot(t_normal, r.d));
+
+    float d = 1.0 / determinant(mat3(ab, ac, -r.d));
+    float u = d * determinant(mat3(ao, ac, -r.d ));
+    float v = d * determinant(mat3(ab, ao, -r.d ));
+
+    if (u < 0.0 || v < 0.0 || u + v > 1.0) return false;
+
+    else if (t_plane < tmax && t_plane > tmin) {
         rec.t = t;
         rec.normal = normal;
         rec.pos = pointOnRay(r, rec.t);
         return true;
     }
+    
     return false;
 }
 
