@@ -76,7 +76,7 @@ Scene* scene = NULL;
 
 Grid* grid_ptr = NULL;
 BVH* bvh_ptr = NULL;
-accelerator Accel_Struct = GRID_ACC; // CHANGE ACCELERATOR TYPE HERE. THE RANDOM SCENCE USES BVH BY DEFAULT.
+accelerator Accel_Struct = BVH_ACC; // CHANGE ACCELERATOR TYPE HERE. THE RANDOM SCENCE USES BVH BY DEFAULT.
 
 int RES_X, RES_Y;
 
@@ -797,17 +797,19 @@ void init_scene(void)
 		for (int o = 0; o < num_objects; o++) {
 			objs.push_back(scene->getObject(o));
 		}
+
 		grid_ptr->Build(objs);
 		printf("Grid built.\n\n");
 	}
 	else if (Accel_Struct == BVH_ACC) {
+		bvh_ptr = new BVH();
 		vector<Object*> objs;
 		int num_objects = scene->getNumObjects();
-		bvh_ptr = new BVH();
 
 		for (int o = 0; o < num_objects; o++) {
 			objs.push_back(scene->getObject(o));
 		}
+
 		bvh_ptr->Build(objs);
 		printf("BVH built.\n\n");
 	}

@@ -60,7 +60,7 @@ class BVH
 	public:
 		BVHNode(void);
 		void setAABB(AABB& bbox_);
-		void setIndex(unsigned int index_) { index = index_; } //TODO: Check if needed
+		void setIndex(unsigned int index_) { index = index_; }
 		void makeLeaf(unsigned int index_, unsigned int n_objs_);
 		void makeNode(unsigned int left_index_);
 		bool isLeaf() { return leaf; }
