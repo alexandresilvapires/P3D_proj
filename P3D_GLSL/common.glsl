@@ -136,10 +136,29 @@ Ray getRay(Camera cam, vec2 pixel_sample)  //rnd pixel_sample viewport coordinat
 {
     vec2 ls = cam.lensRadius * randomInUnitDisk(gSeed);  //ls - lens sample for DOF
     float time = cam.time0 + hash1(gSeed) * (cam.time1 - cam.time0);
-    
-    //Calculate eye_offset and ray direction
 
-    return createRay(eye_offset, normalize(ray direction), time);
+    float x_scalar = cam.width * (pixel_sample.x / iResolution.x - 0.5);
+    float y_scalar = cam.width * (pixel_sample.y / iResolution.y - 0.5);
+    float z_scalar = cam.planeDist;
+
+    // Create center ray
+	vec3 center_ray = vec3(x_scalar, y_scalar, -z_scalar); // goes from eye to pixel_sample, in camera coords
+
+    // Calculate focal ratio -- It should be given?
+    float effectiveApertureDiameter = (cam.lensRadius * 2) / (cam.focusDist / cam.planeDist);
+    float focal_ratio = cam.planeDist / effectiveApertureDiameter;
+
+	vec3 actual_p = vec(center_ray.x * focal_ratio,
+								center_ray.y * focal_ratio,
+								center_ray.z * focal_ratio); // in camera coords.
+
+	vec3 ray_dir = normalize(cam.u * (actual_p.x - ls.x) 
+						+ cam.v * (actual_p.y - ls.y) 
+						+ cam.n * actual_p.z); // in world coordinates
+
+	vec3 eye_offset = cam.eye + cam.u * ls.x + cam.v * ls.y; // also in world coordinates
+
+    return createRay(eye_offset, ray_dir, time);
 }
 
 // MT_ material type
@@ -258,8 +277,6 @@ bool scatter(Ray rIn, HitRecord rec, out vec3 atten, out Ray rScattered)
         //else  //Refraction
         // rScattered = calculate refracted ray
            // atten *= vec3(1.0 - reflectProb); not necessary since we are only scattering 1-reflectProb rays and not all refracted rays
-        }
-
         return true;
     }
     return false;
@@ -335,6 +352,10 @@ MovingSphere createMovingSphere(vec3 center0, vec3 center1, float radius, float 
 
 vec3 center(MovingSphere mvsphere, float time)
 {
+    vec3 moving_center = vec3(
+                            mix(mvsphere.center0.x, mvsphere.center1.x,time),
+                            mix(mvsphere.center0.y, mvsphere.center1.y,time),
+                            mix(mvsphere.center0.z, mvsphere.center1.z,time))
     return moving_center;
 }
 
@@ -364,11 +385,13 @@ bool hit_movingSphere(MovingSphere s, Ray r, float tmin, float tmax, out HitReco
     bool outside;
     float t;
 
+    //Calculate the moving center
+    vec3 center = center(s, r.t);
 
-     //INSERT YOUR CODE HERE
-     //Calculate the moving center
     //calculate a valid t and normal
+    return hit_sphere(Sphere(center, s.radius), r, tmin, tmax, rec);
 	
+    /*
     if(t < tmax && t > tmin) {
         rec.t = t;
         rec.pos = pointOnRay(r, rec.t);
@@ -376,6 +399,7 @@ bool hit_movingSphere(MovingSphere s, Ray r, float tmin, float tmax, out HitReco
         return true;
     }
     else return false;
+    */
 }
 
 struct pointLight {
