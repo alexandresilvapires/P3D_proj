@@ -134,7 +134,7 @@ Camera createCamera(
 
 Ray getRay(Camera cam, vec2 pixel_sample)  //rnd pixel_sample viewport coordinates
 {
-    vec2 ls = cam.lensRadius * randomInUnitDisk(gSeed);  //ls - lens sample for DOF
+    vec2 ls = randomInUnitDisk(gSeed) * cam.lensRadius;  //ls - lens sample for DOF
     float time = cam.time0 + hash1(gSeed) * (cam.time1 - cam.time0);
 
     float x_scalar = cam.width * (pixel_sample.x / iResolution.x - 0.5);
@@ -145,10 +145,10 @@ Ray getRay(Camera cam, vec2 pixel_sample)  //rnd pixel_sample viewport coordinat
 	vec3 center_ray = vec3(x_scalar, y_scalar, -z_scalar); // goes from eye to pixel_sample, in camera coords
 
     // Calculate focal ratio -- It should be given?
-    float effectiveApertureDiameter = (cam.lensRadius * 2) / (cam.focusDist / cam.planeDist);
+    float effectiveApertureDiameter = (cam.lensRadius * 2.0) / (cam.focusDist / cam.planeDist);
     float focal_ratio = cam.planeDist / effectiveApertureDiameter;
 
-	vec3 actual_p = vec(center_ray.x * focal_ratio,
+	vec3 actual_p = vec3(center_ray.x * focal_ratio,
 								center_ray.y * focal_ratio,
 								center_ray.z * focal_ratio); // in camera coords.
 
@@ -231,56 +231,71 @@ float schlick(float cosine, float refIdx)
 }
 
 bool scatter(Ray rIn, HitRecord rec, out vec3 atten, out Ray rScattered)
-{
-    if(rec.material.type == MT_DIFFUSE)
+{    
+    if (rec.material.type == MT_DIFFUSE)
     {
-        //INSERT CODE HERE,
+        rScattered = createRay(rec.pos, rec.normal + normalize(randomInUnitSphere(gSeed)));
         atten = rec.material.albedo * max(dot(rScattered.d, rec.normal), 0.0) / pi;
+        
         return true;
     }
-    if(rec.material.type == MT_METAL)
+    if (rec.material.type == MT_METAL)
     {
-       //INSERT CODE HERE, consider fuzzy reflections
+        vec3 fuzzy_direction = normalize(reflect(rIn.d, rec.normal) + rec.material.roughness * randomInUnitSphere(gSeed)); 
+
+        rScattered = createRay(rec.pos, fuzzy_direction);
         atten = rec.material.specColor;
-        return true;
+
+        return dot(fuzzy_direction, rec.normal) > 0.0;
     }
-    if(rec.material.type == MT_DIALECTRIC)
+
+    if (rec.material.type == MT_DIALECTRIC)
     {
         atten = vec3(1.0);
         vec3 outwardNormal;
         float niOverNt;
-        float cosine;
+        float cosine = -dot(rIn.d, rec.normal);
+        bool total_internal_ref = false;
 
         if(dot(rIn.d, rec.normal) > 0.0) //hit inside
         {
             outwardNormal = -rec.normal;
             niOverNt = rec.material.refIdx;
-            cosine = refraction cosine for schlick; 
-            atten = apply Beer's law by using rec.material.refractColor
+
+            float sin_t2 = niOverNt * niOverNt * (1.0 - cosine * cosine);
+            if (sin_t2 > 1.0)
+                total_internal_ref = true;
+
+		    cosine = sqrt(1.0 - sin_t2);
+            atten *= exp(-rec.material.refractColor * rec.t); // t is the distance
         }
         else  //hit from outside
         {
             outwardNormal = rec.normal;
             niOverNt = 1.0 / rec.material.refIdx;
-            cosine = -dot(rIn.d, rec.normal); 
         }
 
         //Use probabilistic math to decide if scatter a reflected ray or a refracted ray
 
         float reflectProb;
-
-        //if no total reflection  reflectProb = schlick(cosine, rec.material.refIdx);  
-        //else reflectProb = 1.0;
-
-        if( hash1(gSeed) < reflectProb)  //Reflection
-        // rScattered = calculate reflected ray
-          // atten *= vec3(reflectProb); not necessary since we are only scattering reflectProb rays and not all reflected rays
         
-        //else  //Refraction
-        // rScattered = calculate refracted ray
-           // atten *= vec3(1.0 - reflectProb); not necessary since we are only scattering 1-reflectProb rays and not all refracted rays
+        if (!total_internal_ref) {
+            reflectProb = schlick(cosine, rec.material.refIdx);  
+        }
+        else {
+            reflectProb = 1.0;
+        }
+
+        if (hash1(gSeed) < reflectProb) { //Reflection
+            rScattered = createRay(rec.pos, reflect(rIn.d, rec.normal));
+        }  
+        else { //Refraction
+            rScattered = createRay(rec.pos, refract(rIn.d, rec.normal, niOverNt));
+        } 
+        
         return true;
     }
+
     return false;
 }
 
@@ -358,7 +373,7 @@ vec3 center(MovingSphere mvsphere, float time)
     vec3 moving_center = vec3(
                             mix(mvsphere.center0.x, mvsphere.center1.x,time),
                             mix(mvsphere.center0.y, mvsphere.center1.y,time),
-                            mix(mvsphere.center0.z, mvsphere.center1.z,time))
+                            mix(mvsphere.center0.z, mvsphere.center1.z,time));
     return moving_center;
 }
 
