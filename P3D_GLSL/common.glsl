@@ -225,7 +225,9 @@ struct HitRecord
 
 float schlick(float cosine, float refIdx)
 {
-    //INSERT YOUR CODE HERE
+    float r_0 = pow((refIdx - 1.0) / (refIdx + 1.0), 2);
+    float schlick = r_0 + (1.0 - r_0) * pow(1.0 - cosine, 5.0);
+    return schlick;
 }
 
 bool scatter(Ray rIn, HitRecord rec, out vec3 atten, out Ray rScattered)
@@ -368,9 +370,40 @@ vec3 center(MovingSphere mvsphere, float time)
 
 bool hit_sphere(Sphere s, Ray r, float tmin, float tmax, out HitRecord rec)
 {
-    //INSERT YOUR CODE HERE
-    //calculate a valid t and normal
-	
+    // Get quadratic formula parameters
+    vec3 ray_to_center = r.o - s.center;
+    float a = dot(r.d, r.d);
+    float b = 2.0 * dot(ray_to_center, r.d);
+    float c = dot(ray_to_center, ray_to_center) - s.radius * s.radius;
+    
+    // discriminant
+    float d = b * b - 4.0 * a * c;
+
+    // If there are solutions (>?)
+    if (d >= 0.0) {
+
+        // Check first solution
+        float t = (-b - sqrt(d)) / (2.0 * a);
+        if (t < tmax && t > tmin) {
+            rec.t = t;
+            rec.pos = pointOnRay(r, rec.t);
+            rec.normal = normalize(rec.pos - s.center);
+            return true;
+        }
+
+        // Check second solution
+        // ISTO É NECESSÁRIO???
+        t = (-b + sqrt(d)) / (2.0 * a);
+        if (t < tmax && t > tmin) {
+            rec.t = t;
+            rec.pos = pointOnRay(r, rec.t);
+            rec.normal = normalize(rec.pos - s.center);
+            return true;
+        }
+    }
+
+    return false;
+	/*
     if(t < tmax && t > tmin) {
         rec.t = t;
         rec.pos = pointOnRay(r, rec.t);
@@ -378,6 +411,7 @@ bool hit_sphere(Sphere s, Ray r, float tmin, float tmax, out HitRecord rec)
         return true;
     }
     else return false;
+    */
 }
 
 bool hit_movingSphere(MovingSphere s, Ray r, float tmin, float tmax, out HitRecord rec)
