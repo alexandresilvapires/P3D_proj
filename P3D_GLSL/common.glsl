@@ -297,18 +297,19 @@ bool hit_triangle(Triangle t, Ray r, float tmin, float tmax, out HitRecord rec)
     vec3 ac = t.c - t.a;
     vec3 ao = r.o - t.a;
     
-    vec3 normal = normalize(cross(ab, ac));
-    float t_plane = -(dot(ao, t_normal) / dot(t_normal, r.d));
-
+    // compute the possible intersection using Cramer's rule
     float d = 1.0 / determinant(mat3(ab, ac, -r.d));
-    float u = d * determinant(mat3(ao, ac, -r.d ));
-    float v = d * determinant(mat3(ab, ao, -r.d ));
+    float beta = d * determinant(mat3(ao, ac, -r.d ));
+    float gamma = d * determinant(mat3(ab, ao, -r.d ));
+    float hit_time = d * determinant(mat3(ab, ac, ao));
 
-    if (u < 0.0 || v < 0.0 || u + v > 1.0) return false;
+    // since we are using baricentric coordinates, we need to make sure
+    // beta >= 0, gamma >= 0, and that 0 <= beta + gamma <= 1
+    if (beta < 0.0 || gamma < 0.0 || beta + gamma > 1.0) return false;
 
-    else if (t_plane < tmax && t_plane > tmin) {
-        rec.t = t;
-        rec.normal = normal;
+    else if (hit_time < tmax && hit_time > tmin) {
+        rec.t = hit_time;
+        rec.normal = normalize(cross(ab, ac));
         rec.pos = pointOnRay(r, rec.t);
         return true;
     }
