@@ -116,9 +116,9 @@ void BVH::build_recursive(int left_index, int right_index, BVHNode *node) {
 	cmp.sort_dim = get_largest_dim(left_index, right_index);
 	std::sort(objects.begin() + left_index, objects.begin() + right_index, cmp);
 
-	int split_index = get_split_index(left_index, right_index, node); // -1 means not worth splitting
+	int split_index = left_index + (right_index - left_index) / 2;
 	
-	if (split_index == -1 || right_index - left_index <= Threshold) {
+	if (right_index - left_index <= Threshold) {
 		node->makeLeaf(left_index, right_index - left_index);
 	}
 	else {
@@ -139,7 +139,7 @@ void BVH::build_recursive(int left_index, int right_index, BVHNode *node) {
 		BVHNode* right_node = new BVHNode();
 
 		AABB right_bb = objects[split_index]->GetBoundingBox();
-		for (int i = split_index; i < right_index; i++) {
+		for (int i = split_index + 1; i < right_index; i++) {
 			right_bb.extend(objects[i]->GetBoundingBox());
 		}
 
