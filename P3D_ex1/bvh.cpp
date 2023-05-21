@@ -155,15 +155,91 @@ void BVH::build_recursive(int left_index, int right_index, BVHNode *node) {
 }
 
 bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
-	float tmp1, tmp2;
+	float tmp1 = FLT_MAX, tmp2 = FLT_MAX;
 	float tmin = FLT_MAX;  //contains the closest primitive intersection
-	bool hit = false;
 
 	BVHNode* currentNode = nodes[0];
 
 	bool hit_world = currentNode->getAABB().intercepts(ray, tmin);
 
 	if (hit_world == false) return false;
+	
+	tmin = FLT_MAX;
+
+	while (true) {
+		if (!currentNode->isLeaf()) {
+			// Case for not in leaf
+			BVHNode* left = nodes[currentNode->getIndex()];
+			BVHNode* right = nodes[currentNode->getIndex() + 1];
+
+			bool hit_left = left->getAABB().intercepts(ray, tmp1);
+			bool hit_right = right->getAABB().intercepts(ray, tmp2);
+
+			if (hit_left && hit_right) {
+				// Both hit: furthest one goes to the stack, current node is now the closest
+				if (tmp1 < tmp2) {
+					hit_stack.push(StackItem(right, tmp2));
+					currentNode = left;
+				}
+				else {
+					hit_stack.push(StackItem(left, tmp1));
+					currentNode = right;
+				}
+			}
+			// If only one hit, that one becomes the current node
+			else if (hit_left) {
+				currentNode = left;
+			}
+			else if (hit_right) {
+				currentNode = right;
+			}
+		}
+		else 
+		{ // Case for leaf
+			for (int i = 0; i < currentNode->getNObjs(); i++) {
+				Object* o = objects[currentNode->getIndex() + i];
+				
+				if (o->intercepts(ray, tmp1)) {
+					if (tmp1 < tmin) {
+						tmin = tmp1;
+						*hit_obj = o;
+					}
+				}
+			}
+		}
+
+		while (!hit_stack.empty()) {
+			StackItem st = hit_stack.top();
+			hit_stack.pop();
+
+			if (st.t < tmin) {
+				currentNode = st.ptr;
+			}
+		}
+
+		if (hit_stack.empty()) {
+			hit_point = ray.origin + ray.direction * tmin;
+			return true;
+		}
+	}
+
+	// Never reached
+	return false;
+}
+
+bool BVH::Traverse(Ray& ray) {  //shadow ray with length
+	double length = ray.direction.length(); //distance between light and intersection point
+	ray.direction.normalize();
+
+	float tmp1 = FLT_MAX, tmp2 = FLT_MAX;
+
+	BVHNode* currentNode = nodes[0];
+
+	bool hit_world = currentNode->getAABB().intercepts(ray, tmp1);
+
+	if (hit_world == false) return false;
+
+	tmp1 = FLT_MAX;
 
 	while (true) {
 		if (!currentNode->isLeaf()) {
@@ -195,81 +271,10 @@ bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
 		}
 		else {
 			// Case for leaf
-			for (int i = 0; i <= currentNode->getNObjs(); i++) {
+			for (int i = 0; i < currentNode->getNObjs(); i++) {
 				Object* o = getObjs()[currentNode->getIndex() + i];
-
-				bool has_hit = o->intercepts(ray, tmp1);
-
-				if (has_hit) {
-					if (tmp1 < tmin) {
-						tmin = tmp1;
-						hit_obj = &o;
-						hit = true; // Se calhar está errado
-					}
-				}
-			}
-		}
-		while (!hit_stack.empty()) {
-			StackItem st = hit_stack.top();
-			hit_stack.pop();
-			if (st.t < tmin) {
-				currentNode = st.ptr;
-			}
-		}
-		if (hit_stack.empty()) {
-			hit_point = ray.origin + ray.direction * tmin;
-			return hit == true;
-		}
-	}
-
-	// Never reached
-	return(false);
-}
-
-bool BVH::Traverse(Ray& ray) {  //shadow ray with length
-	double length = ray.direction.length(); //distance between light and intersection point
-	ray.direction.normalize();
-
-	float tmp1, tmp2;
-	float tmin = FLT_MAX;  //contains the closest primitive intersection
-	bool hit = false;
-
-	BVHNode* currentNode = nodes[0];
-
-	bool hit_world = currentNode->getAABB().intercepts(ray, tmin);
-
-	if (hit_world == false) return false;
-
-	while (true) {
-		if (!currentNode->isLeaf()) {
-			// Case for not in leaf
-			BVHNode* left = nodes[currentNode->getIndex()];
-			BVHNode* right = nodes[currentNode->getIndex() + 1];
-
-			bool hit_left = left->getAABB().intercepts(ray, tmp1);
-			bool hit_right = right->getAABB().intercepts(ray, tmp2);
-
-			if (hit_left && hit_right) {
-				// Both hit: furthest one goes to the stack, current node is now the closest
-				hit_stack.push(StackItem(left, tmp1));
-				currentNode = right;
-			}
-			// If only one hit, that one becomes the current node
-			else if (hit_left) {
-				currentNode = left;
-			}
-			else if (hit_right) {
-				currentNode = right;
-			}
-		}
-		else {
-			// Case for leaf
-			for (int i = 0; i <= currentNode->getNObjs(); i++) {
-				Object* o = getObjs()[currentNode->getIndex()+i];
-
-				bool has_hit = o->intercepts(ray, tmp1);
-
-				if (has_hit) {
+				
+				if (o->intercepts(ray, tmp1)) {
 					return true;
 				}
 			}
@@ -285,5 +290,5 @@ bool BVH::Traverse(Ray& ray) {  //shadow ray with length
 	}
 
 	// Never reached
-	return(false);
+	return false;
 }	

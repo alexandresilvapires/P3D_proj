@@ -754,7 +754,6 @@ void init_scene(void)
 	char scene_name[70];
 
 	scene = new Scene();
-	scene->SetAccelStruct(Accel_Struct);
 
 	if (P3F_scene) {  //Loading a P3F scene
 
@@ -773,6 +772,7 @@ void init_scene(void)
 		}
 
 		scene->load_p3f(scene_name);
+		printf("Using accel nr. %d\n", scene->GetAccelStruct());
 		printf("Scene loaded.\n\n");
 	}
 	else {
