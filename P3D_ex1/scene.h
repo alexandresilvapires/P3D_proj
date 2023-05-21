@@ -160,6 +160,11 @@ public:
 	void SetAccelStruct(accelerator accel_t) { accel_struc_type = accel_t; }
 	void SetSamplesPerPixel(unsigned int spp) { samples_per_pixel = spp; }
 
+	Color GetBackground(Ray& r) {
+		if (GetSkyBoxFlg()) return GetSkyboxColor(r);
+		else return GetBackgroundColor();
+	}
+
 	int getNumObjects( );
 	void addObject( Object* o );
 	Object* getObject( unsigned int index );
