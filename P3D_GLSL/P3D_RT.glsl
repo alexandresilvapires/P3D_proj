@@ -185,6 +185,7 @@ vec3 rayColor(Ray r)
     {
         if(hit_world(r, 0.001, 10000.0, rec))
         {
+            /* ---- This is the original code block for LOCAL LIGHT, untouched
             //calculate direct lighting with 3 white point lights:
             {
                 //createPointLight(vec3(-10.0, 15.0, 0.0), vec3(1.0, 1.0, 1.0))
@@ -193,12 +194,25 @@ vec3 rayColor(Ray r)
 
                 //for instance: col += directlighting(createPointLight(vec3(-10.0, 15.0, 0.0), vec3(1.0, 1.0, 1.0)), r, rec) * throughput;
             }
+            // OG code ends here */
+
+            //calculate direct lighting with 3 white point lights
+            col += directlighting(createPointLight(vec3(-10.0, 15.0, 0.0), vec3(1.0, 1.0, 1.0)), r, rec) * throughput;
+            col += directlighting(createPointLight(vec3(8.0, 15.0, 3.0), vec3(1.0, 1.0, 1.0)), r, rec) * throughput;
+            col += directlighting(createPointLight(vec3(1.0, 15.0, -9.0), vec3(1.0, 1.0, 1.0)), r, rec) * throughput;
            
             //calculate secondary ray and update throughput
             Ray scatterRay;
             vec3 atten;
             if(scatter(r, rec, atten, scatterRay))
-            {   //  insert your code here    }
+            {
+                r = scatterRay;
+                throughput *= atten;
+            }
+            else{
+                // Never should happen, since the material always scatters light
+                break; 
+            }
         
         }
         else  //background
