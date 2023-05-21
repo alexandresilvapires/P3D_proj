@@ -218,8 +218,11 @@ bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
 		}
 
 		if (hit_stack.empty()) {
-			hit_point = ray.origin + ray.direction * tmin;
-			return true;
+			if (*hit_obj != nullptr) {
+				hit_point = ray.origin + ray.direction * tmin;
+				return true;
+			}
+			return false;
 		}
 	}
 
