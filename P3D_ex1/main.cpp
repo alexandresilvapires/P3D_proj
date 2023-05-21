@@ -506,7 +506,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		intersected = bvh_ptr->Traverse(ray, &closest_obj, closest_hp);
 	}
 
-	if (!intersected) return scene->GetBackgroundColor(); // Ray traveled to infinity and beyond
+	if (!intersected) return scene->GetBackground(ray); // Ray traveled to infinity and beyond
 
 	Color color = Color();
 	int num_lights = scene->getNumLights();
