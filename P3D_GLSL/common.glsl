@@ -384,33 +384,34 @@ vec3 center(MovingSphere mvsphere, float time)
 bool hit_sphere(Sphere s, Ray r, float tmin, float tmax, out HitRecord rec)
 {
     vec3 oc = s.center - r.o;
+    float t;
 
     // b = d * OC
-    float b = r.d * oc;
+    float b = dot(r.d, oc);
 
     // c = OC.OC - r^2
-    float c = (oc * oc) - (s.radius * s.radius);
+    float c = dot(oc, oc) - (s.radius * s.radius);
 
     // if ray outside
-    if (c > 0 && b <= 0) return false;
+    if (c > 0.0 && b <= 0.0) return false;
 
     float discriminant = b * b - c;
     // if discriminant is negative
-    if (discriminant <= 0) return false;
+    if (discriminant <= 0.0) return false;
 
     // if origin outside
-    if (c > 0) {
-        t = b - std::sqrt(discriminant);
+    if (c > 0.0) {
+        t = b - sqrt(discriminant);
     }
     else {
-        t = b + std::sqrt(discriminant);
+        t = b + sqrt(discriminant);
     }
 
     // Check if t within range
     if (t < tmax && t > tmin) {
         rec.t = t;
         rec.pos = pointOnRay(r, rec.t);
-        rec.normal = normal
+        rec.normal = normalize(rec.pos - s.center);
         return true;
     }
     else {
