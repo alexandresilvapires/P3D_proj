@@ -140,10 +140,9 @@ Ray getRay(Camera cam, vec2 pixel_sample)  //rnd pixel_sample viewport coordinat
 
     float x_scalar = cam.width * (pixel_sample.x / iResolution.x - 0.5);
     float y_scalar = cam.height * (pixel_sample.y / iResolution.y - 0.5);
-    float z_scalar = cam.planeDist;
 
     // Create center ray
-	vec3 center_ray = vec3(x_scalar, y_scalar, -z_scalar); // goes from eye to pixel_sample, in camera coords
+	vec3 center_ray = vec3(x_scalar, y_scalar, cam.planeDist); // goes from eye to pixel_sample, in camera coords
 
 	vec3 actual_p = vec3(center_ray.x * cam.focusDist,
 						    center_ray.y * cam.focusDist,
