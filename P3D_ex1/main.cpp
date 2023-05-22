@@ -519,65 +519,67 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	Vector biased_hp = closest_hp + normal * EPSILON;
 	Vector biased_dir_to_orig = (ray.origin - biased_hp).normalize();
 
-	// Any objects between the intersection and direct light? If so, they're in the shadow.
-	for (int i = 0; i < num_lights; i++) {
-		Light* light = scene->getLight(i);
-		
-		// SOFT SHADOWING WITH ANTIALIASING
-		Vector light_dir = (light->position - biased_hp).normalize();
-		
-		// Define the parallelogram of the light with two orthogonal vectors
-		Vector up = Vector(0, 1, 0);
-		Vector a = (up % light_dir).normalize();
-		Vector b = (light_dir % a).normalize();
+	if (!inside) {
+		// Any objects between the intersection and direct light? If so, they're in the shadow.
+		for (int i = 0; i < num_lights; i++) {
+			Light* light = scene->getLight(i);
 
-		// Scale the vectors to get corner point
-		a *= 0.5;
-		b *= 0.5;
-		Vector corner_point = light->position - a - b;
+			// SOFT SHADOWING WITH ANTIALIASING
+			Vector light_dir = (light->position - biased_hp).normalize();
 
-		// Choose a random point from the parallelogram
-		Vector perturbed_light_pos = corner_point + a * rand_float() * 2 + b * rand_float() * 2;
-		Vector perturbed_light_dir = (perturbed_light_pos - biased_hp).normalize();
+			// Define the parallelogram of the light with two orthogonal vectors
+			Vector up = Vector(0, 1, 0);
+			Vector a = (up % light_dir).normalize();
+			Vector b = (light_dir % a).normalize();
 
-		if (perturbed_light_dir * normal > 0) {
-			bool vis = true;
+			// Scale the vectors to get corner point
+			a *= 0.5;
+			b *= 0.5;
+			Vector corner_point = light->position - a - b;
 
-			if (accel == NONE) {
-				Ray shadow_ray = Ray(biased_hp, perturbed_light_dir);
+			// Choose a random point from the parallelogram
+			Vector perturbed_light_pos = corner_point + a * rand_float() * 2 + b * rand_float() * 2;
+			Vector perturbed_light_dir = (perturbed_light_pos - biased_hp).normalize();
 
-				for (int t = 0; t < num_objs; t++) {
-					Object* obj = scene->getObject(t);
-					float dist = 0;
+			if (perturbed_light_dir * normal > 0) {
+				bool vis = true;
 
-					if (obj->intercepts(shadow_ray, dist)) {
-						// if the object hit by the shadow feeler is *behind* the light source, it shouldn't be considered
-						if (dist < (perturbed_light_pos - biased_hp).length()) {
-							vis = false;
-							break;
+				if (accel == NONE) {
+					Ray shadow_ray = Ray(biased_hp, perturbed_light_dir);
+
+					for (int t = 0; t < num_objs; t++) {
+						Object* obj = scene->getObject(t);
+						float dist = 0;
+
+						if (obj->intercepts(shadow_ray, dist)) {
+							// if the object hit by the shadow feeler is *behind* the light source, it shouldn't be considered
+							if (dist < (perturbed_light_pos - biased_hp).length()) {
+								vis = false;
+								break;
+							}
 						}
 					}
 				}
-			}
-			else if (accel == GRID_ACC) {
-				Ray shadow_ray = Ray(biased_hp, perturbed_light_pos - biased_hp);
+				else if (accel == GRID_ACC) {
+					Ray shadow_ray = Ray(biased_hp, perturbed_light_pos - biased_hp);
 
-				vis = !grid_ptr->Traverse(shadow_ray);
-			}
-			else if (accel == BVH_ACC) {
-				Ray shadow_ray = Ray(biased_hp, perturbed_light_pos - biased_hp);
+					vis = !grid_ptr->Traverse(shadow_ray);
+				}
+				else if (accel == BVH_ACC) {
+					Ray shadow_ray = Ray(biased_hp, perturbed_light_pos - biased_hp);
 
-				vis = !bvh_ptr->Traverse(shadow_ray);
-			}
+					vis = !bvh_ptr->Traverse(shadow_ray);
+				}
 
-			if (vis) {
-				Vector halfway = (perturbed_light_dir + biased_dir_to_orig).normalize(); // l_dir + dir from biased_hp to ray origin
+				if (vis) {
+					Vector halfway = (perturbed_light_dir + biased_dir_to_orig).normalize(); // l_dir + dir from biased_hp to ray origin
 
-				color += light->color * closest_obj->GetMaterial()->GetDiffColor() * closest_obj->GetMaterial()->GetDiffuse() *
+					color += light->color * closest_obj->GetMaterial()->GetDiffColor() * closest_obj->GetMaterial()->GetDiffuse() *
 						max(perturbed_light_dir * normal, 0.0f); // diffuse component
-						
-				color += light->color * closest_obj->GetMaterial()->GetSpecColor() * closest_obj->GetMaterial()->GetSpecular() *
+
+					color += light->color * closest_obj->GetMaterial()->GetSpecColor() * closest_obj->GetMaterial()->GetSpecular() *
 						pow(max(halfway * normal, 0.0f), closest_obj->GetMaterial()->GetShine()); // specular component
+				}
 			}
 		}
 	}

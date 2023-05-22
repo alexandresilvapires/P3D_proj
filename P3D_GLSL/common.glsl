@@ -230,7 +230,7 @@ bool scatter(Ray rIn, HitRecord rec, out vec3 atten, out Ray rScattered)
 {    
     if (rec.material.type == MT_DIFFUSE)
     {
-        rScattered = createRay(rec.pos, rec.normal + normalize(randomInUnitSphere(gSeed)));
+        rScattered = createRay(rec.pos + epsilon * rec.normal, rec.normal + normalize(randomInUnitSphere(gSeed)));
         atten = rec.material.albedo * max(dot(rScattered.d, rec.normal), 0.0) / pi;
         
         return true;
@@ -239,7 +239,7 @@ bool scatter(Ray rIn, HitRecord rec, out vec3 atten, out Ray rScattered)
     {
         vec3 fuzzy_direction = normalize(reflect(rIn.d, rec.normal) + rec.material.roughness * randomInUnitSphere(gSeed)); 
 
-        rScattered = createRay(rec.pos, fuzzy_direction);
+        rScattered = createRay(rec.pos + epsilon * rec.normal, fuzzy_direction);
         atten = rec.material.specColor;
 
         return dot(fuzzy_direction, rec.normal) > 0.0;
@@ -283,10 +283,10 @@ bool scatter(Ray rIn, HitRecord rec, out vec3 atten, out Ray rScattered)
         }
 
         if (hash1(gSeed) < reflectProb) { //Reflection
-            rScattered = createRay(rec.pos, reflect(rIn.d, rec.normal));
+            rScattered = createRay(rec.pos + epsilon * rec.normal, reflect(rIn.d, rec.normal));
         }  
         else { //Refraction
-            rScattered = createRay(rec.pos, refract(rIn.d, rec.normal, niOverNt));
+            rScattered = createRay(rec.pos - epsilon * rec.normal, refract(rIn.d, rec.normal, niOverNt));
         } 
         
         return true;

@@ -167,13 +167,13 @@ vec3 directlighting(pointLight pl, Ray r, HitRecord rec){
     vec3 diffCol = rec.material.albedo;
     vec3 specCol = rec.material.specColor;
     vec3 colorOut = vec3(0.0, 0.0, 0.0);
-    float shininess = 4.0 / (pow(rec.material.roughness,4.0) + epsilon) - 2.0;
+    float shininess = 4.0 / (pow(rec.material.roughness, 4.0) + epsilon) - 2.0;
 
     vec3 l = normalize(pl.pos - rec.pos);
 
-    vec3 halfway = normalize(l + normalize(r.o - rec.pos));
+    vec3 halfway = normalize(l - r.d);
 
-    colorOut = pl.color *( diffCol * dot(rec.normal, l) + specCol * pow(dot(halfway, rec.normal), shininess));
+    colorOut = pl.color * (diffCol * dot(rec.normal, l) + specCol * pow(dot(halfway, rec.normal), shininess));
 
     HitRecord dummy;
     
@@ -208,7 +208,6 @@ vec3 rayColor(Ray r)
                 // Never should happen, since the material always scatters light
                 break; 
             }
-        
         }
         else  //background
         {
@@ -268,6 +267,6 @@ void main()
     }
 
     float w = prev.w + 1.0;
-    color = mix(prevLinear, color, 1.0/w);
+    color = mix(prevLinear, color, 1.0 / w);
     gl_FragColor = vec4(toGamma(color), w);
 }

@@ -123,7 +123,7 @@ void BVH::build_recursive(int left_index, int right_index, BVHNode *node) {
 	}
 	else {
 		// Initiate current node as an interior node with leftNode and rightNode as children:
-		node->makeNode(nodes.size()); // this already sets the idx to the idx of the left node
+		node->makeNode(nodes.size()); // this sets the node idx to the future idx of the left node
 
 		// Create left node and assign it its index and AABB
 		BVHNode* left_node = new BVHNode();
