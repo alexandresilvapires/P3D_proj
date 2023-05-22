@@ -169,13 +169,19 @@ vec3 directlighting(pointLight pl, Ray r, HitRecord rec){
     vec3 colorOut = vec3(0.0, 0.0, 0.0);
     float shininess = 4.0 / (pow(rec.material.roughness, 4.0) + epsilon) - 2.0;
 
-    vec3 l = normalize(pl.pos - rec.pos);
-
-    vec3 halfway = normalize(l - r.d);
-
-    colorOut = pl.color * (diffCol * max(dot(rec.normal, l),0.0) + specCol * pow(max(dot(halfway, rec.normal),0.0), shininess));
-
+    float tmin, tmax;
     HitRecord dummy;
+
+
+    if(hit_world(createRay(r.o + rec.normal*epsilon, r.d), tmin, tmax, dummy)){
+        vec3 l = normalize(pl.pos - rec.pos);
+
+        vec3 halfway = normalize(l - r.d);
+
+        colorOut = pl.color * (diffCol * max(dot(rec.normal, l),0.0) + specCol * pow(max(dot(halfway, rec.normal),0.0), shininess));
+    }
+
+
     
 	return colorOut; 
 }
