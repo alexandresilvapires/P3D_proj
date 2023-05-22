@@ -145,12 +145,10 @@ Ray getRay(Camera cam, vec2 pixel_sample)  //rnd pixel_sample viewport coordinat
 	vec3 center_ray = vec3(x_scalar, y_scalar, -z_scalar); // goes from eye to pixel_sample, in camera coords
 
     // Calculate focal ratio -- It should be given?
-    float effectiveApertureDiameter = (cam.lensRadius * 2.0) / (cam.focusDist / cam.planeDist);
-    float focal_ratio = cam.planeDist / effectiveApertureDiameter;
 
-	vec3 actual_p = vec3(center_ray.x * focal_ratio,
-								center_ray.y * focal_ratio,
-								center_ray.z * focal_ratio); // in camera coords.
+	vec3 actual_p = vec3(center_ray.x * cam.focusDist,
+								center_ray.y * cam.focusDist,
+								center_ray.z * cam.focusDist * cam.planeDist); // in camera coords.
 
 	vec3 ray_dir = normalize(cam.u * (actual_p.x - ls.x) 
 						+ cam.v * (actual_p.y - ls.y) 
@@ -225,7 +223,7 @@ struct HitRecord
 
 float schlick(float cosine, float refIdx)
 {
-    float r_0 = pow((refIdx - 1.0) / (refIdx + 1.0), 2);
+    float r_0 = pow((refIdx - 1.0) / (refIdx + 1.0), 2.0);
     float schlick = r_0 + (1.0 - r_0) * pow(1.0 - cosine, 5.0);
     return schlick;
 }

@@ -164,12 +164,18 @@ if(hit_sphere(
 }
 
 vec3 directlighting(pointLight pl, Ray r, HitRecord rec){
-    vec3 diffCol, specCol;
+    vec3 diffCol = rec.material.albedo;
+    vec3 specCol = rec.material.specColor;
     vec3 colorOut = vec3(0.0, 0.0, 0.0);
-    float shininess;
-    HitRecord dummy;
+    float shininess = 4.0 / (pow(rec.material.roughness,4.0) + epsilon) - 2.0;
 
-   //INSERT YOUR CODE HERE
+    vec3 l = normalize(pl.pos - rec.pos);
+
+    vec3 halfway = normalize(l + normalize(r.o - rec.pos));
+
+    colorOut = pl.color *( diffCol * dot(rec.normal, l) + specCol * pow(dot(halfway, rec.normal), shininess));
+
+    HitRecord dummy;
     
 	return colorOut; 
 }
