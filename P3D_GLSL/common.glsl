@@ -385,48 +385,39 @@ vec3 center(MovingSphere mvsphere, float time)
 
 bool hit_sphere(Sphere s, Ray r, float tmin, float tmax, out HitRecord rec)
 {
-    // Get quadratic formula parameters
-    vec3 ray_to_center = r.o - s.center;
-    float a = dot(r.d, r.d);
-    float b = 2.0 * dot(ray_to_center, r.d);
-    float c = dot(ray_to_center, ray_to_center) - s.radius * s.radius;
-    
-    // discriminant
-    float d = b * b - 4.0 * a * c;
+    vec3 oc = s.center - r.o;
 
-    // If there are solutions (>?)
-    if (d >= 0.0) {
+    // b = d * OC
+    float b = r.d * oc;
 
-        // Check first solution
-        float t = (-b - sqrt(d)) / (2.0 * a);
-        if (t < tmax && t > tmin) {
-            rec.t = t;
-            rec.pos = pointOnRay(r, rec.t);
-            rec.normal = normalize(rec.pos - s.center);
-            return true;
-        }
+    // c = OC.OC - r^2
+    float c = (oc * oc) - (s.radius * s.radius);
 
-        // Check second solution
-        // ISTO É NECESSÁRIO???
-        t = (-b + sqrt(d)) / (2.0 * a);
-        if (t < tmax && t > tmin) {
-            rec.t = t;
-            rec.pos = pointOnRay(r, rec.t);
-            rec.normal = normalize(rec.pos - s.center);
-            return true;
-        }
+    // if ray outside
+    if (c > 0 && b <= 0) return false;
+
+    float discriminant = b * b - c;
+    // if discriminant is negative
+    if (discriminant <= 0) return false;
+
+    // if origin outside
+    if (c > 0) {
+        t = b - std::sqrt(discriminant);
+    }
+    else {
+        t = b + std::sqrt(discriminant);
     }
 
-    return false;
-	/*
-    if(t < tmax && t > tmin) {
+    // Check if t within range
+    if (t < tmax && t > tmin) {
         rec.t = t;
         rec.pos = pointOnRay(r, rec.t);
         rec.normal = normal
         return true;
     }
-    else return false;
-    */
+    else {
+        return false;
+    }
 }
 
 bool hit_movingSphere(MovingSphere s, Ray r, float tmin, float tmax, out HitRecord rec)
