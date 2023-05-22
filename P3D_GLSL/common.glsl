@@ -135,24 +135,23 @@ Camera createCamera(
 Ray getRay(Camera cam, vec2 pixel_sample)  //rnd pixel_sample viewport coordinates
 {
     vec2 ls = randomInUnitDisk(gSeed) * cam.lensRadius;  //ls - lens sample for DOF
+
     float time = cam.time0 + hash1(gSeed) * (cam.time1 - cam.time0);
 
     float x_scalar = cam.width * (pixel_sample.x / iResolution.x - 0.5);
-    float y_scalar = cam.width * (pixel_sample.y / iResolution.y - 0.5);
+    float y_scalar = cam.height * (pixel_sample.y / iResolution.y - 0.5);
     float z_scalar = cam.planeDist;
 
     // Create center ray
 	vec3 center_ray = vec3(x_scalar, y_scalar, -z_scalar); // goes from eye to pixel_sample, in camera coords
 
-    // Calculate focal ratio -- It should be given?
-
 	vec3 actual_p = vec3(center_ray.x * cam.focusDist,
-								center_ray.y * cam.focusDist,
-								center_ray.z * cam.focusDist * cam.planeDist); // in camera coords.
+						    center_ray.y * cam.focusDist,
+                            cam.focusDist * cam.planeDist); // in camera coords.
 
 	vec3 ray_dir = normalize(cam.u * (actual_p.x - ls.x) 
 						+ cam.v * (actual_p.y - ls.y) 
-						+ cam.n * actual_p.z); // in world coordinates
+						- cam.n * actual_p.z); // in world coordinates
 
 	vec3 eye_offset = cam.eye + cam.u * ls.x + cam.v * ls.y; // also in world coordinates
 
@@ -393,11 +392,11 @@ bool hit_sphere(Sphere s, Ray r, float tmin, float tmax, out HitRecord rec)
     float c = dot(oc, oc) - (s.radius * s.radius);
 
     // if ray outside
-    if (c > 0.0 && b <= 0.0) return false;
+    if (c > 0.0 && b < 0.0) return false;
 
     float discriminant = b * b - c;
     // if discriminant is negative
-    if (discriminant <= 0.0) return false;
+    if (discriminant < 0.0) return false;
 
     // if origin outside
     if (c > 0.0) {
