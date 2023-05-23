@@ -189,7 +189,7 @@ AABB Sphere::GetBoundingBox() {
 	a_max.y = max(center.y - radius, center.y + radius);
 	a_max.z = max(center.z - radius, center.z + radius);
 
-	a_min += EPSILON;
+	a_min -= EPSILON;
 	a_max += EPSILON;
 
 	return AABB(a_min, a_max);

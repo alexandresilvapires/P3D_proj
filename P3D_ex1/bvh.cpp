@@ -138,7 +138,7 @@ void BVH::build_recursive(int left_index, int right_index, BVHNode *node) {
 		// Create left node and assign it its index and AABB
 		BVHNode* left_node = new BVHNode();
 
-		AABB left_bb = objects[left_index]->GetBoundingBox();
+		AABB left_bb = AABB(objects[left_index]->GetBoundingBox().min, objects[left_index]->GetBoundingBox().max);
 		for (int i = left_index + 1; i < split_index; i++) {
 			left_bb.extend(objects[i]->GetBoundingBox());
 		}
@@ -148,7 +148,7 @@ void BVH::build_recursive(int left_index, int right_index, BVHNode *node) {
 		// Create right node and assign it its index and AABB
 		BVHNode* right_node = new BVHNode();
 
-		AABB right_bb = objects[split_index]->GetBoundingBox();
+		AABB right_bb = AABB(objects[split_index]->GetBoundingBox().min, objects[split_index]->GetBoundingBox().max);
 		for (int i = split_index + 1; i < right_index; i++) {
 			right_bb.extend(objects[i]->GetBoundingBox());
 		}
@@ -173,7 +173,7 @@ bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
 	bool hit_world = currentNode->getAABB().intercepts(ray, tmin);
 
 	if (hit_world == false) return false;
-	
+
 	tmin = FLT_MAX;
 
 	while (true) {
@@ -186,15 +186,12 @@ bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
 			bool hit_right = right->getAABB().intercepts(ray, tmp2);
 
 			if (hit_left && hit_right) {
-				////printf("we hit it all!\n");
 				// Both hit: furthest one goes to the stack, current node is now the closest
 				if (tmp1 < tmp2) {
-					//printf("we hit both next is left: Is leaf? %d ; Index: %d ; NObjs: %d \n", left->isLeaf(), left->getIndex(), left->getNObjs());
 					hit_stack.push(StackItem(right, tmp2));
 					currentNode = left;
 				}
 				else {
-					//printf("we hit both next is right: Is leaf? %d ; Index: %d ; NObjs: %d \n", right->isLeaf(), right->getIndex(), right->getNObjs());
 					hit_stack.push(StackItem(left, tmp1));
 					currentNode = right;
 				}
@@ -202,26 +199,21 @@ bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
 			}
 			// If only one hit, that one becomes the current node
 			else if (hit_left) {
-				////printf("we hit left: Is leaf? %d ; Index: %d ; NObjs: %d \n", left->isLeaf(), left->getIndex(), left->getNObjs());
 				currentNode = left;
 				continue;
 			}
 			else if (hit_right) {
-				////printf("we hit right: Is leaf? %d ; Index: %d ; NObjs: %d \n", right->isLeaf(), right->getIndex(), right->getNObjs());
 				currentNode = right;
 				continue;
 			}
 		}
 		else 
-		{ // Case for leaf
-			////printf("we in leaf bro\n");
+		{ // Case for leaf;
 			for (int i = 0; i < currentNode->getNObjs(); i++) {
-				//printf("we here loopin \n");
 				Object* o = objects[currentNode->getIndex() + i];
-				
+
 				if (o->intercepts(ray, tmp1)) {
 					if (tmp1 < tmin) {
-						//printf("we hit an object!\n");
 						tmin = tmp1;
 						*hit_obj = o;
 					}
@@ -241,10 +233,8 @@ bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
 		if (hit_stack.empty()) {
 			if (*hit_obj != nullptr) {
 				hit_point = ray.origin + ray.direction * tmin;
-				//printf("we return true\n");
 				return true;
 			}
-			//printf("Big F returning false\n");
 			return false;
 		}
 
@@ -278,15 +268,9 @@ bool BVH::Traverse(Ray& ray) {  //shadow ray with length
 			bool hit_right = right->getAABB().intercepts(ray, tmp2);
 
 			if (hit_left && hit_right) {
-				// Both hit: furthest one goes to the stack, current node is now the closest
-				if (tmp1 < tmp2) {
-					hit_stack.push(StackItem(right, tmp2));
-					currentNode = left;
-				}
-				else {
-					hit_stack.push(StackItem(left, tmp1));
-					currentNode = right;
-				}
+				// Both hit: Right one goes to stack, left is current
+				hit_stack.push(StackItem(right, tmp2));
+				currentNode = left;
 				continue;
 			}
 			// If only one hit, that one becomes the current node
