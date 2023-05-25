@@ -42,14 +42,15 @@ void BVH::Build(vector<Object *> &objs) {
 	root->setAABB(world_bbox);
 	root->setIndex(0);
 			
-	//printf("we have %d objects!\n", objects.size());
+	printf("we have %d objects!\n", objects.size());
 	nodes.push_back(root);
 	build_recursive(0, objects.size(), root); // -> root node takes all the 
 
 	for (BVHNode* n : nodes) {
-		//printf("Node: Is leaf? %d ; Index: %d ; NObjs: %d \n", n->isLeaf(), n->getIndex(), n->getNObjs());
+		printf("Node: Is leaf? %d ; Index: %d ; NObjs: %d \n", n->isLeaf(), n->getIndex(), n->getNObjs());
 	}
 }
+
 
 int BVH::get_split_index(int left_index, int right_index, BVHNode *parent) {
 	int total_objs = right_index - left_index;
@@ -185,6 +186,9 @@ bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
 			bool hit_left = left->getAABB().intercepts(ray, tmp1);
 			bool hit_right = right->getAABB().intercepts(ray, tmp2);
 
+			if (left->getAABB().isInside(ray.origin)) tmp1 = 0;
+			if (right->getAABB().isInside(ray.origin)) tmp2 = 0;
+
 			if (hit_left && hit_right) {
 				// Both hit: furthest one goes to the stack, current node is now the closest
 				if (tmp1 < tmp2) {
@@ -266,6 +270,9 @@ bool BVH::Traverse(Ray& ray) {  //shadow ray with length
 
 			bool hit_left = left->getAABB().intercepts(ray, tmp1);
 			bool hit_right = right->getAABB().intercepts(ray, tmp2);
+
+			if (left->getAABB().isInside(ray.origin)) tmp1 = 0;
+			if (right->getAABB().isInside(ray.origin)) tmp2 = 0;
 
 			if (hit_left && hit_right) {
 				// Both hit: Right one goes to stack, left is current
