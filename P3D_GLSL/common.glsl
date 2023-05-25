@@ -417,7 +417,7 @@ bool hit_sphere(Sphere s, Ray r, float tmin, float tmax, out HitRecord rec)
     if (t < tmax && t > tmin) {
         rec.t = t;
         rec.pos = pointOnRay(r, rec.t);
-        rec.normal = normalize(rec.pos - s.center);
+        rec.normal = (rec.pos - s.center) / s.radius;
         return true;
     }
     else {

@@ -59,7 +59,7 @@ bool hit_world(Ray r, float tmin, float tmax, out HitRecord rec)
     }
 
     if(hit_sphere(
-            createSphere(vec3(0.0, 1.0, 0.0), -0.95),
+            createSphere(vec3(0.0, 1.0, 0.0), -0.5),
             r,
             tmin,
             rec.t,
@@ -181,7 +181,7 @@ vec3 directlighting(pointLight pl, Ray r, HitRecord rec){
         if (!hit_world(shadowRay, epsilon, len, dummy)) {
             vec3 halfway = normalize(l - r.d);
             float spec_intensity = max(dot(halfway, rec.normal),0.0);
-            
+
             colorOut = pl.color * 
                         (diffCol * intensity + 
                         specCol * pow(spec_intensity, shininess));
