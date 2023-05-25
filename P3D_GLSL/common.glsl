@@ -221,16 +221,22 @@ struct HitRecord
 
 float schlick(float cosine, float refIdx)
 {
-    float r_0 = pow((refIdx - 1.0) / (refIdx + 1.0), 2.0);
-    float schlick = r_0 + (1.0 - r_0) * pow(1.0 - cosine, 5.0);
-    return schlick;
+    float r_0;
+    if (refIdx == 1.0) {
+        r_0 = pow((1.0 - refIdx) / (1.0 + refIdx), 2.0);
+    }
+    else {
+        r_0 = pow((refIdx - 1.0) / (refIdx + 1.0), 2.0);
+    }
+    
+    return r_0 + (1.0 - r_0) * pow(1.0 - cosine, 5.0);
 }
 
 bool scatter(Ray rIn, HitRecord rec, out vec3 atten, out Ray rScattered)
 {    
     if (rec.material.type == MT_DIFFUSE)
     {
-        rScattered = createRay(rec.pos + epsilon * rec.normal, rec.normal + normalize(randomInUnitSphere(gSeed)));
+        rScattered = createRay(rec.pos + epsilon * rec.normal, normalize(rec.normal + randomInUnitSphere(gSeed)));
         atten = rec.material.albedo * max(dot(rScattered.d, rec.normal), 0.0) / pi;
         
         return true;
@@ -258,12 +264,13 @@ bool scatter(Ray rIn, HitRecord rec, out vec3 atten, out Ray rScattered)
             outwardNormal = -rec.normal;
             niOverNt = rec.material.refIdx;
 
+            
             float sin_t2 = niOverNt * niOverNt * (1.0 - cosine * cosine);
-            if (sin_t2 > 1.0)
+            if (sqrt(sin_t2) > 1.0)
                 total_internal_ref = true;
-
 		    cosine = sqrt(1.0 - sin_t2);
-            atten *= exp(-rec.material.refractColor * rec.t); // t is the distance
+
+            atten = exp(-rec.material.refractColor * rec.t); // t is the distance
         }
         else  //hit from outside
         {
@@ -283,10 +290,10 @@ bool scatter(Ray rIn, HitRecord rec, out vec3 atten, out Ray rScattered)
         }
 
         if (hash1(gSeed) < reflectProb) { //Reflection
-            rScattered = createRay(rec.pos + epsilon * rec.normal, reflect(rIn.d, rec.normal));
+            rScattered = createRay(rec.pos + epsilon * rec.normal, reflect(rIn.d, outwardNormal));
         }  
         else { //Refraction
-            rScattered = createRay(rec.pos - epsilon * rec.normal, refract(rIn.d, rec.normal, niOverNt));
+            rScattered = createRay(rec.pos - epsilon * rec.normal, refract(rIn.d, outwardNormal, niOverNt));
         } 
         
         return true;
