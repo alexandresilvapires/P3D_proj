@@ -139,30 +139,30 @@ void BVH::build_recursive(int left_index, int right_index, BVHNode *node) {
 		// Create left node and assign it its index and AABB
 		BVHNode* left_node = new BVHNode();
 
-		AABB left_bb = AABB(objects[left_index]->GetBoundingBox().min, objects[left_index]->GetBoundingBox().max);
-		for (int i = left_index + 1; i < split_index; i++) {
-			left_bb.extend(objects[i]->GetBoundingBox());
-		}
+AABB left_bb = AABB(objects[left_index]->GetBoundingBox().min, objects[left_index]->GetBoundingBox().max);
+for (int i = left_index + 1; i < split_index; i++) {
+	left_bb.extend(objects[i]->GetBoundingBox());
+}
 
-		left_node->setAABB(left_bb);
+left_node->setAABB(left_bb);
 
-		// Create right node and assign it its index and AABB
-		BVHNode* right_node = new BVHNode();
+// Create right node and assign it its index and AABB
+BVHNode* right_node = new BVHNode();
 
-		AABB right_bb = AABB(objects[split_index]->GetBoundingBox().min, objects[split_index]->GetBoundingBox().max);
-		for (int i = split_index + 1; i < right_index; i++) {
-			right_bb.extend(objects[i]->GetBoundingBox());
-		}
+AABB right_bb = AABB(objects[split_index]->GetBoundingBox().min, objects[split_index]->GetBoundingBox().max);
+for (int i = split_index + 1; i < right_index; i++) {
+	right_bb.extend(objects[i]->GetBoundingBox());
+}
 
-		right_node->setAABB(right_bb);
+right_node->setAABB(right_bb);
 
-		// Push back leftNode and rightNode into nodes vector
-		nodes.push_back(left_node);
-		nodes.push_back(right_node);
+// Push back leftNode and rightNode into nodes vector
+nodes.push_back(left_node);
+nodes.push_back(right_node);
 
-		build_recursive(left_index, split_index, left_node);
-		build_recursive(split_index, right_index, right_node);
-	}		
+build_recursive(left_index, split_index, left_node);
+build_recursive(split_index, right_index, right_node);
+	}
 }
 
 bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
@@ -211,7 +211,7 @@ bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
 				continue;
 			}
 		}
-		else 
+		else
 		{ // Case for leaf;
 			for (int i = 0; i < currentNode->getNObjs(); i++) {
 				Object* o = objects[currentNode->getIndex() + i];
@@ -225,22 +225,23 @@ bool BVH::Traverse(Ray& ray, Object** hit_obj, Vector& hit_point) {
 			}
 		}
 
+		bool changed = false;
 		while (!hit_stack.empty()) {
 			StackItem st = hit_stack.top();
 			hit_stack.pop();
 
 			if (st.t < tmin) {
 				currentNode = st.ptr;
-				continue;
+				changed = true;
+				break;
 			}
 		}
-		if (hit_stack.empty()) {
-			if (*hit_obj != nullptr) {
-				hit_point = ray.origin + ray.direction * tmin;
-				return true;
-			}
-			return false;
+		if (changed) continue;
+
+		if (*hit_obj != nullptr) {
+			hit_point = ray.origin + ray.direction * tmin;
 		}
+		return (*hit_obj != nullptr);
 
 	}
 
