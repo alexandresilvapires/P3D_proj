@@ -257,18 +257,19 @@ bool scatter(Ray rIn, HitRecord rec, out vec3 atten, out Ray rScattered)
         vec3 outwardNormal;
         float niOverNt;
         float cosine = -dot(rIn.d, rec.normal);
+        
         bool total_internal_ref = false;
 
-        if(dot(rIn.d, rec.normal) > 0.0) //hit inside
+        if (dot(rIn.d, rec.normal) > 0.0) //hit inside
         {
             outwardNormal = -rec.normal;
             niOverNt = rec.material.refIdx;
-
             
             float sin_t2 = niOverNt * niOverNt * (1.0 - cosine * cosine);
             if (sqrt(sin_t2) > 1.0)
                 total_internal_ref = true;
-		    cosine = sqrt(1.0 - sin_t2);
+		    
+            cosine = sqrt(1.0 - sin_t2);
 
             atten = exp(-rec.material.refractColor * rec.t); // t is the distance
         }
@@ -290,10 +291,10 @@ bool scatter(Ray rIn, HitRecord rec, out vec3 atten, out Ray rScattered)
         }
 
         if (hash1(gSeed) < reflectProb) { //Reflection
-            rScattered = createRay(rec.pos + epsilon * rec.normal, reflect(rIn.d, outwardNormal));
+            rScattered = createRay(rec.pos + epsilon * outwardNormal, reflect(rIn.d, outwardNormal));
         }  
         else { //Refraction
-            rScattered = createRay(rec.pos - epsilon * rec.normal, refract(rIn.d, outwardNormal, niOverNt));
+            rScattered = createRay(rec.pos - epsilon * outwardNormal, refract(rIn.d, outwardNormal, niOverNt));
         } 
         
         return true;
