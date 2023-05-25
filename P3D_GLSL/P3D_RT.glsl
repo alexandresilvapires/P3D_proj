@@ -173,13 +173,18 @@ vec3 directlighting(pointLight pl, Ray r, HitRecord rec){
     float intensity = max(dot(rec.normal, l), 0.0);
     float len = length(pl.pos - rec.pos);
 
-    float tmin, tmax;
     HitRecord dummy;
 
+    Ray shadowRay = createRay(rec.pos + rec.normal * epsilon, l);
+
     if (intensity > 0.0) {
-        if(!hit_world(createRay(r.o + rec.normal * epsilon, l), epsilon, len, dummy)) {
+        if (!hit_world(shadowRay, epsilon, len, dummy)) {
             vec3 halfway = normalize(l - r.d);
-            colorOut = pl.color * (diffCol * intensity + specCol * pow(max(dot(halfway, rec.normal),0.0), shininess));
+            float spec_intensity = max(dot(halfway, rec.normal),0.0);
+            
+            colorOut = pl.color * 
+                        (diffCol * intensity + 
+                        specCol * pow(spec_intensity, shininess));
         }
     }
 
@@ -242,7 +247,7 @@ void main()
     vec3 camPos = vec3(mouse.x * 10.0, mouse.y * 5.0, 8.0);
     vec3 camTarget = vec3(0.0, 0.0, -1.0);
     float fovy = 60.0;
-    float aperture = 0.0;
+    float aperture = 5.0;
     float distToFocus = 1.0;
     float time0 = 0.0;
     float time1 = 1.0;
