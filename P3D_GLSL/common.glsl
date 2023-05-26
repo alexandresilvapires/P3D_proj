@@ -271,7 +271,7 @@ bool scatter(Ray rIn, HitRecord rec, out vec3 atten, out Ray rScattered)
 		    
             cosine = sqrt(1.0 - sin_t2);
 
-            atten = exp(-rec.material.refractColor * rec.t); // t is the distance
+            atten *= exp(-rec.material.refractColor * rec.t); // t is the distance
         }
         else  //hit from outside
         {
@@ -291,10 +291,12 @@ bool scatter(Ray rIn, HitRecord rec, out vec3 atten, out Ray rScattered)
         }
 
         if (hash1(gSeed) < reflectProb) { //Reflection
-            rScattered = createRay(rec.pos + epsilon * outwardNormal, reflect(rIn.d, outwardNormal));
+            vec3 fuzzy_direction = normalize(reflect(rIn.d, rec.normal) + rec.material.roughness * randomInUnitSphere(gSeed));
+            rScattered = createRay(rec.pos + rec.normal * epsilon, fuzzy_direction);
         }  
         else { //Refraction
-            rScattered = createRay(rec.pos - epsilon * outwardNormal, refract(rIn.d, outwardNormal, niOverNt));
+            vec3 fuzzy_direction = normalize(refract(rIn.d, outwardNormal, niOverNt) + rec.material.roughness * randomInUnitSphere(gSeed));
+            rScattered = createRay(rec.pos - outwardNormal * epsilon, fuzzy_direction);
         } 
         
         return true;
