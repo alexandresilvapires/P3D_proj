@@ -21,7 +21,7 @@ bool hit_world(Ray r, float tmin, float tmax, out HitRecord rec)
     if(hit_triangle(createTriangle(vec3(-10.0, -0.01, -10.0), vec3(10.0, -0.01, 10), vec3(10.0, -0.01, -10.0)), r, tmin, rec.t, rec))
     {
         hit = true;
-        rec.material = createDiffuseMaterial(vec3(0.2));
+        rec.material = createDiffuseMaterial(vec3(0.1));
     }
 
     if(hit_sphere(
@@ -211,7 +211,11 @@ vec3 rayColor(Ray r)
                 col += directlighting(createPointLight(vec3(8.0, 15.0, 3.0), vec3(1.0, 1.0, 1.0)), r, rec) * throughput;
                 col += directlighting(createPointLight(vec3(1.0, 15.0, -9.0), vec3(1.0, 1.0, 1.0)), r, rec) * throughput;
             }
-           
+
+            // Add emissive color
+            col += rec.material.emissive * throughput;
+
+
             //calculate secondary ray and update throughput
             Ray scatterRay;
             vec3 atten;
@@ -224,6 +228,16 @@ vec3 rayColor(Ray r)
                 // Never should happen, since the material always scatters light
                 break; 
             }
+
+            // Russian Roulette
+            // As the throughput gets smaller, the ray is more likely to get terminated early.
+            // Survivors have their value boosted to make up for fewer samples being in the average.
+            float p = max(throughput.x, max(throughput.y, throughput.z));
+            if (hash1(gSeed) > p)
+                break;
+
+            // Add the energy we 'lose' by randomly terminating paths
+            throughput *= 1.0f / p;            
         }
         else  //background
         {
@@ -247,7 +261,7 @@ void main()
     vec3 camPos = vec3(mouse.x * 10.0, mouse.y * 5.0, 8.0);
     vec3 camTarget = vec3(0.0, 0.0, -1.0);
     float fovy = 60.0;
-    float aperture = 0.0;
+    float aperture = 3.0;
     float distToFocus = 1.0;
     float time0 = 0.0;
     float time1 = 1.0;
