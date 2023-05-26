@@ -525,7 +525,6 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		// Any objects between the intersection and direct light? If so, they're in the shadow.
 		for (int i = 0; i < num_lights; i++) {
 			Light* light = scene->getLight(i);
-
 			
 			// SOFT SHADOWING WITH ANTIALIASING
 			if (soft_shadows_with_aliasing){
@@ -588,8 +587,9 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 			}
 			// SOFT SHADOWING WITHOUT ANTIALIASING
 			else {
+				int num_lights_per_light = 9;
 				for (int j = 0; j < num_lights_per_light; j++) {
-	 				Vector perturbed_light_pos = light->position + (((float)std::rand() / (float)std::RAND_MAX) - 0.5);
+	 				Vector perturbed_light_pos = light->position + Vector(rand_float() - 0.5, rand_float() - 0.5, rand_float() - 0.5);
 	 				Vector perturbed_light_dir = (perturbed_light_pos - biased_hp).normalize();
 
 	 				if (perturbed_light_dir * normal > 0) {
