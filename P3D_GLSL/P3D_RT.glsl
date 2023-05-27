@@ -21,7 +21,7 @@ bool hit_world(Ray r, float tmin, float tmax, out HitRecord rec)
     if(hit_triangle(createTriangle(vec3(-10.0, -0.01, -10.0), vec3(10.0, -0.01, 10), vec3(10.0, -0.01, -10.0)), r, tmin, rec.t, rec))
     {
         hit = true;
-        rec.material = createDiffuseMaterial(vec3(0.1));
+        rec.material = createDiffuseMaterial(vec3(0.2));
     }
 
     if(hit_sphere(
@@ -55,7 +55,7 @@ bool hit_world(Ray r, float tmin, float tmax, out HitRecord rec)
         rec))
     {
         hit = true;
-        rec.material = createDialectricMaterial(vec3(0.0), 1.333, 0.1);
+        rec.material = createDialectricMaterial(vec3(0.0), 1.333, 0.0);
     }
 
     if(hit_sphere(
@@ -203,9 +203,9 @@ vec3 rayColor(Ray r)
         if(hit_world(r, 0.001, 10000.0, rec))
         {
             bool outside = true;
-            if(i > 0 && dot(rec.normal, r.d) > 0.0) outside = false;
+            if (i > 0 && dot(rec.normal, r.d) > 0.0) outside = false;
 
-            if(outside){
+            if (outside) {
                 //calculate direct lighting with 3 white point lights
                 col += directlighting(createPointLight(vec3(-10.0, 15.0, 0.0), vec3(1.0, 1.0, 1.0)), r, rec) * throughput;
                 col += directlighting(createPointLight(vec3(8.0, 15.0, 3.0), vec3(1.0, 1.0, 1.0)), r, rec) * throughput;
@@ -215,20 +215,20 @@ vec3 rayColor(Ray r)
             // Add emissive color
             col += rec.material.emissive * throughput;
 
-
             //calculate secondary ray and update throughput
             Ray scatterRay;
             vec3 atten;
-            if(scatter(r, rec, atten, scatterRay))
-            {
+            if (scatter(r, rec, atten, scatterRay)) {
                 r = scatterRay;
                 throughput *= atten;
             }
-            else{
+            else {
                 // Never should happen, since the material always scatters light
                 break; 
             }
 
+            // taken from: https://blog.demofox.org/2020/06/14/casual-shadertoy-path-tracing-3-fresnel-rough-refraction-absorption-orbit-camera/
+            // 
             // Russian Roulette
             // As the throughput gets smaller, the ray is more likely to get terminated early.
             // Survivors have their value boosted to make up for fewer samples being in the average.
@@ -237,7 +237,7 @@ vec3 rayColor(Ray r)
                 break;
 
             // Add the energy we 'lose' by randomly terminating paths
-            throughput *= 1.0f / p;            
+            throughput *= 1.0 / p;            
         }
         else  //background
         {

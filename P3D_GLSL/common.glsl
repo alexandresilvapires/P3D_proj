@@ -293,11 +293,21 @@ bool scatter(Ray rIn, HitRecord rec, out vec3 atten, out Ray rScattered)
         if (hash1(gSeed) < reflectProb) { //Reflection
             vec3 fuzzy_direction = normalize(reflect(rIn.d, rec.normal) + rec.material.roughness * randomInUnitSphere(gSeed));
             rScattered = createRay(rec.pos + rec.normal * epsilon, fuzzy_direction);
+
+            // from https://blog.demofox.org/2020/06/14/casual-shadertoy-path-tracing-3-fresnel-rough-refraction-absorption-orbit-camera/
+            // since we chose randomly between diffuse and specular,
+            // we need to account for the times we didn't do one or the other.
+            atten /= reflectProb; // the result will be the same as dividing the throughput itself, since it will be multiplied by atten
         }  
         else { //Refraction
             vec3 fuzzy_direction = normalize(refract(rIn.d, outwardNormal, niOverNt) + rec.material.roughness * randomInUnitSphere(gSeed));
             rScattered = createRay(rec.pos - outwardNormal * epsilon, fuzzy_direction);
-        } 
+
+            // from https://blog.demofox.org/2020/06/14/casual-shadertoy-path-tracing-3-fresnel-rough-refraction-absorption-orbit-camera/
+            // since we chose randomly between diffuse and specular,
+            // we need to account for the times we didn't do one or the other.
+            atten /= 1.0 - reflectProb; // the result will be the same as dividing the throughput itself, since it will be multiplied by atten
+        }
         
         return true;
     }
