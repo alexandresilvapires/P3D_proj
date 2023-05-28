@@ -1,4 +1,4 @@
- ///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 //
 // P3D Course
 // (c) 2021 by João Madeiras Pereira
@@ -61,13 +61,13 @@ char s[32];
 
 
 // Points defined by 2 attributes: positions which are stored in vertices array and colors which are stored in colors array
-float *colors;
-float *vertices;
+float* colors;
+float* vertices;
 int size_vertices;
 int size_colors;
 
 //Array of Pixels to be stored in a file by using DevIL library
-uint8_t *img_Data;
+uint8_t* img_Data;
 
 GLfloat m[16];  //projection matrix initialized by ortho function
 
@@ -91,7 +91,7 @@ int WindowHandle = 0;
 bool isOpenGLError() {
 	bool isError = false;
 	GLenum errCode;
-	const GLubyte *errString;
+	const GLubyte* errString;
 	while ((errCode = glGetError()) != GL_NO_ERROR) {
 		isError = true;
 		errString = gluErrorString(errCode);
@@ -102,7 +102,7 @@ bool isOpenGLError() {
 
 void checkOpenGLError(std::string error)
 {
-	if(isOpenGLError()) {
+	if (isOpenGLError()) {
 		std::cerr << error << std::endl;
 		exit(EXIT_FAILURE);
 	}
@@ -157,7 +157,7 @@ void createShaderProgram()
 
 	glBindAttribLocation(ProgramId, VERTEX_COORD_ATTRIB, "in_Position");
 	glBindAttribLocation(ProgramId, COLOR_ATTRIB, "in_Color");
-	
+
 	glLinkProgram(ProgramId);
 	UniformId = glGetUniformLocation(ProgramId, "Matrix");
 
@@ -191,17 +191,17 @@ void createBufferObjects()
 	glBufferData(GL_ARRAY_BUFFER, size_vertices, NULL, GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(VERTEX_COORD_ATTRIB);
 	glVertexAttribPointer(VERTEX_COORD_ATTRIB, 2, GL_FLOAT, 0, 0, 0);
-	
+
 	glBindBuffer(GL_ARRAY_BUFFER, VboId[1]);
 	glBufferData(GL_ARRAY_BUFFER, size_colors, NULL, GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(COLOR_ATTRIB);
 	glVertexAttribPointer(COLOR_ATTRIB, 3, GL_FLOAT, 0, 0, 0);
-	
-// unbind the VAO
+
+	// unbind the VAO
 	glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-//	glDisableVertexAttribArray(VERTEX_COORD_ATTRIB); 
-//	glDisableVertexAttribArray(COLOR_ATTRIB);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//	glDisableVertexAttribArray(VERTEX_COORD_ATTRIB); 
+	//	glDisableVertexAttribArray(COLOR_ATTRIB);
 	checkOpenGLError("ERROR: Could not create VAOs and VBOs.");
 }
 
@@ -209,7 +209,7 @@ void destroyBufferObjects()
 {
 	glDisableVertexAttribArray(VERTEX_COORD_ATTRIB);
 	glDisableVertexAttribArray(COLOR_ATTRIB);
-	
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
@@ -232,7 +232,7 @@ void drawPoints()
 	glBufferSubData(GL_ARRAY_BUFFER, 0, size_colors, colors);
 
 	glUniformMatrix4fv(UniformId, 1, GL_FALSE, m);
-	glDrawArrays(GL_POINTS, 0, RES_X*RES_Y);
+	glDrawArrays(GL_POINTS, 0, RES_X * RES_Y);
 	glFinish();
 
 	glUseProgram(0);
@@ -242,7 +242,7 @@ void drawPoints()
 	checkOpenGLError("ERROR: Could not draw scene.");
 }
 
-ILuint saveImgFile(const char *filename) {
+ILuint saveImgFile(const char* filename) {
 	ILuint ImageId;
 
 	ilEnable(IL_FILE_OVERWRITE);
@@ -280,8 +280,8 @@ void cleanup()
 	destroyBufferObjects();
 }
 
-void ortho(float left, float right, float bottom, float top, 
-			float nearp, float farp)
+void ortho(float left, float right, float bottom, float top,
+	float nearp, float farp)
 {
 	m[0 * 4 + 0] = 2 / (right - left);
 	m[0 * 4 + 1] = 0.0;
@@ -303,7 +303,7 @@ void ortho(float left, float right, float bottom, float top,
 
 void reshape(int w, int h)
 {
-    glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
 	glViewport(0, 0, w, h);
 	ortho(0, (float)RES_X, 0, (float)RES_Y, -1.0, 1.0);
 }
@@ -312,23 +312,23 @@ void processKeys(unsigned char key, int xx, int yy)
 {
 	switch (key) {
 
-		case 27:
-			glutLeaveMainLoop();
-			break;
+	case 27:
+		glutLeaveMainLoop();
+		break;
 
-		case 'r':
-			camX = Eye.x;
-			camY = Eye.y;
-			camZ = Eye.z;
-			r = Eye.length();
-			beta = asinf(camY / r) * 180.0f / 3.14f;
-			alpha = atanf(camX / camZ) * 180.0f / 3.14f;
-			break;
+	case 'r':
+		camX = Eye.x;
+		camY = Eye.y;
+		camZ = Eye.z;
+		r = Eye.length();
+		beta = asinf(camY / r) * 180.0f / 3.14f;
+		alpha = atanf(camX / camZ) * 180.0f / 3.14f;
+		break;
 
-		case 'c':
-			printf("Camera Spherical Coordinates (%f, %f, %f)\n", r, beta, alpha);
-			printf("Camera Cartesian Coordinates (%f, %f, %f)\n", camX, camY, camZ);
-			break;
+	case 'c':
+		printf("Camera Spherical Coordinates (%f, %f, %f)\n", r, beta, alpha);
+		printf("Camera Cartesian Coordinates (%f, %f, %f)\n", camX, camY, camZ);
+		break;
 	}
 }
 
@@ -419,34 +419,34 @@ void mouseWheel(int wheel, int direction, int x, int y) {
 
 void setupGLEW() {
 	glewExperimental = GL_TRUE;
-	GLenum result = glewInit() ; 
-	if (result != GLEW_OK) { 
+	GLenum result = glewInit();
+	if (result != GLEW_OK) {
 		std::cerr << "ERROR glewInit: " << glewGetString(result) << std::endl;
 		exit(EXIT_FAILURE);
-	} 
+	}
 	GLenum err_code = glGetError();
-	printf ("Vendor: %s\n", glGetString (GL_VENDOR));
-	printf ("Renderer: %s\n", glGetString (GL_RENDERER));
-	printf ("Version: %s\n", glGetString (GL_VERSION));
-	printf ("GLSL: %s\n", glGetString (GL_SHADING_LANGUAGE_VERSION));
+	printf("Vendor: %s\n", glGetString(GL_VENDOR));
+	printf("Renderer: %s\n", glGetString(GL_RENDERER));
+	printf("Version: %s\n", glGetString(GL_VERSION));
+	printf("GLSL: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 }
 
 void setupGLUT(int argc, char* argv[])
 {
 	glutInit(&argc, argv);
-	
+
 	glutInitContextVersion(4, 3);
 	glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 
-	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE,GLUT_ACTION_GLUTMAINLOOP_RETURNS);
-	
+	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
+
 	glutInitWindowPosition(100, 250);
 	glutInitWindowSize(RES_X, RES_Y);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	glDisable(GL_DEPTH_TEST);
 	WindowHandle = glutCreateWindow(CAPTION);
-	if(WindowHandle < 1) {
+	if (WindowHandle < 1) {
 		std::cerr << "ERROR: Could not create a new rendering window." << std::endl;
 		exit(EXIT_FAILURE);
 	}
@@ -462,9 +462,9 @@ float fresnel(float ior_1, float ior_2, Vector dir_to_origin, Vector n_to_surf) 
 	if (ior_1 > ior_2) { // we need to use cos_t, instead of cos_i
 		Vector vn = n_to_surf * (dir_to_origin * n_to_surf);
 		Vector v_to_vn = vn - dir_to_origin;
-	
+
 		float sin_i = v_to_vn.length();
-	
+
 		float sin_t = sin_i * ior_1; // we are inside
 		cos = sqrt(1 - sin_t * sin_t);
 	}
@@ -513,7 +513,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	Color color = Color();
 	int num_lights = scene->getNumLights();
 	Vector normal = closest_obj->getNormal(closest_hp);
-	
+
 	bool inside = false;
 
 	if (ray.direction * normal > 0) normal = normal * (-1), inside = true;
@@ -525,7 +525,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		// Any objects between the intersection and direct light? If so, they're in the shadow.
 		for (int i = 0; i < num_lights; i++) {
 			Light* light = scene->getLight(i);
-			
+
 			// ANTIALIASING
 			if (antialiasing) {
 				Vector light_dir = (light->position - biased_hp).normalize();
@@ -540,52 +540,77 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 				b *= 0.5;
 				Vector corner_point = light->position - a - b;
 
-				// Choose a random point from the parallelogram
-				Vector perturbed_light_pos;
+				// Number of samples = 4
+				int n2 = 4 * 4;
 
-				if (soft_shadows) perturbed_light_pos = corner_point + a * rand_float() * 2 + b * rand_float() * 2;
-				else perturbed_light_pos = light->position;
+				// Jittered samples
+				std::vector<Vector> r(n2); // pixel samples
+				std::vector<Vector> s(n2); // light samples
 
-				Vector perturbed_light_dir = (perturbed_light_pos - biased_hp).normalize();
+				// Generate random 2D points
+				for (int j = 0; j < n2; j++) {
+					r[j] = Vector(rand_float(), rand_float(), 0);
+					s[j] = Vector(rand_float(), rand_float(), 0);
+				}
 
-				if (perturbed_light_dir * normal > 0) {
-					bool vis = true;
+				// Shuffle s
+				for (int j = n2 - 1; j >= 1; j--) {
+					int t = rand_int() % (j + 1);
+					Vector temp = s[j];
+					s[j] = s[t];
+					s[t] = temp;
+				}
 
-					if (accel == NONE) {
-						Ray shadow_ray = Ray(biased_hp, perturbed_light_dir);
+				for (int p = 0; p < n2; p++) {
+					Vector perturbed_hp = biased_hp + Vector(r[p].x, r[p].y, 0); // Perturb the hit point with pixel samples
 
-						for (int t = 0; t < num_objs; t++) {
-							Object* obj = scene->getObject(t);
-							float dist = 0;
+					// Choose a random point from the parallelogram
+					Vector perturbed_light_pos;
 
-							if (obj->intercepts(shadow_ray, dist)) {
-								// if the object hit by the shadow feeler is *behind* the light source, it shouldn't be considered
-								if (dist < (perturbed_light_pos - biased_hp).length()) {
-									vis = false;
-									break;
+					if (soft_shadows) perturbed_light_pos = corner_point + a * (s[p].x * 2) + b * (s[p].y * 2); // Perturb the light position with light samples
+					else perturbed_light_pos = light->position;
+
+					Vector perturbed_light_dir = (perturbed_light_pos - perturbed_hp).normalize();
+
+					if (perturbed_light_dir * normal > 0) {
+						bool vis = true;
+
+						if (accel == NONE) {
+							Ray shadow_ray = Ray(biased_hp, perturbed_light_dir);
+
+							for (int t = 0; t < num_objs; t++) {
+								Object* obj = scene->getObject(t);
+								float dist = 0;
+
+								if (obj->intercepts(shadow_ray, dist)) {
+									// if the object hit by the shadow feeler is *behind* the light source, it shouldn't be considered
+									if (dist < (perturbed_light_pos - biased_hp).length()) {
+										vis = false;
+										break;
+									}
 								}
 							}
 						}
-					}
-					else if (accel == GRID_ACC) {
-						Ray shadow_ray = Ray(biased_hp, perturbed_light_pos - biased_hp);
+						else if (accel == GRID_ACC) {
+							Ray shadow_ray = Ray(biased_hp, perturbed_light_pos - biased_hp);
 
-						vis = !grid_ptr->Traverse(shadow_ray);
-					}
-					else if (accel == BVH_ACC) {
-						Ray shadow_ray = Ray(biased_hp, perturbed_light_pos - biased_hp);
+							vis = !grid_ptr->Traverse(shadow_ray);
+						}
+						else if (accel == BVH_ACC) {
+							Ray shadow_ray = Ray(biased_hp, perturbed_light_pos - biased_hp);
 
-						vis = !bvh_ptr->Traverse(shadow_ray);
-					}
+							vis = !bvh_ptr->Traverse(shadow_ray);
+						}
 
-					if (vis) {
-						Vector halfway = (perturbed_light_dir + biased_dir_to_orig).normalize(); // halfway vector because computing the reflected dir is costly
+						if (vis) {
+							Vector halfway = (perturbed_light_dir + biased_dir_to_orig).normalize(); // halfway vector because computing the reflected dir is costly
 
-						color += light->color * closest_obj->GetMaterial()->GetDiffColor() * closest_obj->GetMaterial()->GetDiffuse() *
-							max(perturbed_light_dir * normal, 0.0f); // diffuse component
+							color += light->color * closest_obj->GetMaterial()->GetDiffColor() * closest_obj->GetMaterial()->GetDiffuse() *
+								max(perturbed_light_dir * normal, 0.0f) * (1.0f / n2); // diffuse component
 
-						color += light->color * closest_obj->GetMaterial()->GetSpecColor() * closest_obj->GetMaterial()->GetSpecular() *
-							pow(max(halfway * normal, 0.0f), closest_obj->GetMaterial()->GetShine()); // specular component
+							color += light->color * closest_obj->GetMaterial()->GetSpecColor() * closest_obj->GetMaterial()->GetSpecular() *
+								pow(max(halfway * normal, 0.0f), closest_obj->GetMaterial()->GetShine()) * (1.0f / n2); // specular component
+						}
 					}
 				}
 			}
@@ -603,7 +628,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 					Vector perturbed_light_dir = (perturbed_light_pos - biased_hp).normalize();
 
 
-	 				if (perturbed_light_dir * normal > 0) {
+					if (perturbed_light_dir * normal > 0) {
 						bool vis = true;
 
 						if (accel == NONE) {
@@ -643,8 +668,8 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 								pow(max(halfway * normal, 0.0f), closest_obj->GetMaterial()->GetShine()) * (1.0f / num_lights_per_light); // specular component
 						}
 					}
-	 			}
-	 		}
+				}
+			}
 		}
 	}
 
@@ -655,13 +680,13 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 	// ---	RAY CASTING PART FINISHED	---
 	// ---	---------------------------	---
 	// ---	TIME FOR PROPER PHYSICS		---
-	
+
 	if (closest_obj->GetMaterial()->GetReflection() > 0 || closest_obj->GetMaterial()->GetTransmittance() > 0) {
 		float ior = closest_obj->GetMaterial()->GetRefrIndex();
 
 		Vector v = ray.direction * (-1);
 		Vector refl_dir = (normal * (v * normal) * 2 - v).normalize();
-		
+
 		Vector fuzzy_direction = (refl_dir + rnd_unit_sphere() * roughness).normalize();
 
 		Color refl_color;
@@ -685,14 +710,14 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 			Ray refr_ray = Ray(closest_hp - normal * EPSILON, refr_dir);
 
 			refr_color = rayTracing(refr_ray, depth + 1, ior_1);
-			
-			float kr = (inside) ? fresnel(ior, ior_1, ray.direction * (-1), normal) 
-								: fresnel(ior_1, ior, ray.direction * (-1), normal);
+
+			float kr = (inside) ? fresnel(ior, ior_1, ray.direction * (-1), normal)
+				: fresnel(ior_1, ior, ray.direction * (-1), normal);
 
 			color += (
-					refl_color * kr +
-					refr_color * (1 - kr) * closest_obj->GetMaterial()->GetTransmittance()
-					);
+				refl_color * kr +
+				refr_color * (1 - kr) * closest_obj->GetMaterial()->GetTransmittance()
+				);
 		}
 		else {
 			color += refl_color * closest_obj->GetMaterial()->GetSpecColor() * closest_obj->GetMaterial()->GetSpecular();
@@ -732,8 +757,8 @@ void renderScene()
 				for (int p = 0; p < AA_sample_size; p++) {
 					for (int q = 0; q < AA_sample_size; q++) {
 
-							pixel.x = x + (p + (0.5f + rand_float()) / AA_sample_size);
-							pixel.y = y + (q + (0.5f + rand_float()) / AA_sample_size);
+						pixel.x = x + (p + (0.5f + rand_float()) / AA_sample_size);
+						pixel.y = y + (q + (0.5f + rand_float()) / AA_sample_size);
 
 						lens_sample = rnd_unit_disk() * scene->GetCamera()->GetAperture(); // random coords in unit disc
 
@@ -862,7 +887,7 @@ void init_scene(void)
 	printf("\nResolutionX = %d  ResolutionY= %d.\n", RES_X, RES_Y);
 
 	// Pixel buffer to be used in the Save Image function
-	img_Data = (uint8_t*)malloc(3 * RES_X*RES_Y * sizeof(uint8_t));
+	img_Data = (uint8_t*)malloc(3 * RES_X * RES_Y * sizeof(uint8_t));
 	if (img_Data == NULL) exit(1);
 
 	if (scene->GetAccelStruct() == GRID_ACC) {
@@ -910,7 +935,7 @@ int main(int argc, char* argv[])
 	}
 	ilInit();
 
-	int 
+	int
 		ch;
 	if (!drawModeEnabled) {
 
@@ -927,14 +952,14 @@ int main(int argc, char* argv[])
 			delete(scene);
 			free(img_Data);
 			ch = _getch();
-		} while((toupper(ch) == 'Y')) ;
+		} while ((toupper(ch) == 'Y'));
 	}
 
 	else {   //Use OpenGL to draw image in the screen
 		printf("OPENGL DRAWING MODE\n\n");
 		init_scene();
-		size_vertices = 2 * RES_X*RES_Y * sizeof(float);
-		size_colors = 3 * RES_X*RES_Y * sizeof(float);
+		size_vertices = 2 * RES_X * RES_Y * sizeof(float);
+		size_colors = 3 * RES_X * RES_Y * sizeof(float);
 		vertices = (float*)malloc(size_vertices);
 		if (vertices == NULL) exit(1);
 		colors = (float*)malloc(size_colors);
