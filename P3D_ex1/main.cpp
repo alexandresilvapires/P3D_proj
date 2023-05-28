@@ -653,7 +653,6 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		Vector v = ray.direction * (-1);
 		Vector refl_dir = (normal * (v * normal) * 2 - v).normalize();
 		
-		// !! roughness parameter for each object
 		Vector fuzzy_direction = (refl_dir + rnd_unit_sphere() * ROUGHNESS).normalize();
 
 		Color refl_color;
