@@ -31,6 +31,8 @@ bool P3F_scene = true; //choose between P3F scene or a built-in random scene
 
 bool soft_shadows_with_aliasing = true;
 
+float ROUGHNESS = 0.0f;
+
 #define MAX_DEPTH 4  //number of bounces
 
 #define CAPTION "Whitted Ray-Tracer"
@@ -575,7 +577,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 					}
 
 					if (vis) {
-						Vector halfway = (perturbed_light_dir + biased_dir_to_orig).normalize(); // l_dir + dir from biased_hp to ray origin
+						Vector halfway = (perturbed_light_dir + biased_dir_to_orig).normalize(); // use halfway vector, instead of computing the reflection dir
 
 						color += light->color * closest_obj->GetMaterial()->GetDiffColor() * closest_obj->GetMaterial()->GetDiffuse() *
 							max(perturbed_light_dir * normal, 0.0f); // diffuse component
@@ -623,7 +625,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 						}
 
 						if (vis) {
-							Vector halfway = (perturbed_light_dir + biased_dir_to_orig).normalize(); // l_dir + dir from biased_hp to ray origin
+							Vector halfway = (perturbed_light_dir + biased_dir_to_orig).normalize(); // use halfway vector, instead of computing the reflection dir
 
 							color += light->color * closest_obj->GetMaterial()->GetDiffColor() * closest_obj->GetMaterial()->GetDiffuse() *
 								max(perturbed_light_dir * normal, 0.0f) * (1.0f / num_lights_per_light); // diffuse component
@@ -652,7 +654,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		Vector refl_dir = (normal * (v * normal) * 2 - v).normalize();
 		
 		// !! roughness parameter for each object
-		Vector fuzzy_direction = (refl_dir + rnd_unit_sphere() * 0.0f).normalize();
+		Vector fuzzy_direction = (refl_dir + rnd_unit_sphere() * ROUGHNESS).normalize();
 
 		Color refl_color;
 		if (fuzzy_direction * normal > 0) { // otherwise, there will be no reflection
