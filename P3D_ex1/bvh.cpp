@@ -42,13 +42,8 @@ void BVH::Build(vector<Object *> &objs) {
 	root->setAABB(world_bbox);
 	root->setIndex(0);
 			
-	printf("we have %d objects!\n", objects.size());
 	nodes.push_back(root);
 	build_recursive(0, objects.size(), root); // -> root node takes all the 
-
-	for (BVHNode* n : nodes) {
-		printf("Node: Is leaf? %d ; Index: %d ; NObjs: %d \n", n->isLeaf(), n->getIndex(), n->getNObjs());
-	}
 }
 
 
@@ -139,29 +134,29 @@ void BVH::build_recursive(int left_index, int right_index, BVHNode *node) {
 		// Create left node and assign it its index and AABB
 		BVHNode* left_node = new BVHNode();
 
-AABB left_bb = AABB(objects[left_index]->GetBoundingBox().min, objects[left_index]->GetBoundingBox().max);
-for (int i = left_index + 1; i < split_index; i++) {
-	left_bb.extend(objects[i]->GetBoundingBox());
-}
-
-left_node->setAABB(left_bb);
-
-// Create right node and assign it its index and AABB
-BVHNode* right_node = new BVHNode();
-
-AABB right_bb = AABB(objects[split_index]->GetBoundingBox().min, objects[split_index]->GetBoundingBox().max);
-for (int i = split_index + 1; i < right_index; i++) {
-	right_bb.extend(objects[i]->GetBoundingBox());
-}
-
-right_node->setAABB(right_bb);
-
-// Push back leftNode and rightNode into nodes vector
-nodes.push_back(left_node);
-nodes.push_back(right_node);
-
-build_recursive(left_index, split_index, left_node);
-build_recursive(split_index, right_index, right_node);
+		AABB left_bb = AABB(objects[left_index]->GetBoundingBox().min, objects[left_index]->GetBoundingBox().max);
+		for (int i = left_index + 1; i < split_index; i++) {
+			left_bb.extend(objects[i]->GetBoundingBox());
+		}
+		
+		left_node->setAABB(left_bb);
+		
+		// Create right node and assign it its index and AABB
+		BVHNode* right_node = new BVHNode();
+		
+		AABB right_bb = AABB(objects[split_index]->GetBoundingBox().min, objects[split_index]->GetBoundingBox().max);
+		for (int i = split_index + 1; i < right_index; i++) {
+			right_bb.extend(objects[i]->GetBoundingBox());
+		}
+		
+		right_node->setAABB(right_bb);
+		
+		// Push back leftNode and rightNode into nodes vector
+		nodes.push_back(left_node);
+		nodes.push_back(right_node);
+		
+		build_recursive(left_index, split_index, left_node);
+		build_recursive(split_index, right_index, right_node);
 	}
 }
 

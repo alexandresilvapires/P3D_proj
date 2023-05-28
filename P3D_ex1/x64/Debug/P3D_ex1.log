@@ -1,17 +1,2 @@
-﻿  bvh.cpp
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\maths.h(69,23): warning C4244: 'return' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\camera.h(75,18): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\camera.h(76,18): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\camera.h(88,18): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\camera.h(89,18): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\color.h(42,14): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\color.h(41,14): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\color.h(40,28): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\bvh.cpp(27,49): warning C4267: 'return' : conversion de 'size_t' en 'int', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\bvh.cpp(46,41): warning C4267: 'argument' : conversion de 'size_t' en 'int', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\bvh.cpp(77,16): warning C4244: 'return' : conversion de 'float' en 'int', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\bvh.cpp(126,30): warning C4267: 'argument' : conversion de 'size_t' en 'unsigned int', perte possible de données
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\bvh.cpp(199,22): warning C4018: '<' : incompatibilité signed/unsigned
-C:\Users\jfons\Documents\P3D_proj\P3D_ex1\bvh.cpp(277,22): warning C4018: '<' : incompatibilité signed/unsigned
-  P3D_ex1.vcxproj -> C:\Users\jfons\Documents\P3D_proj\x64\Debug\P3D_ex1.exe
-  0 fichier(s) copiÚ(s)
+﻿  P3D_ex1.vcxproj -> C:\Users\jfons\Documents\P3D_proj\x64\Debug\P3D_ex1.exe
+  0 File(s) copied

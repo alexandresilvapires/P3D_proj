@@ -25,13 +25,14 @@
 #include "macros.h"
 
 //Enable OpenGL drawing.  
-bool drawModeEnabled = false;
+bool drawModeEnabled = true;
 
 bool P3F_scene = true; //choose between P3F scene or a built-in random scene
 
-bool soft_shadows_with_aliasing = true;
-
-float ROUGHNESS = 0.0f;
+bool soft_shadows = true;
+bool antialiasing = true;
+int AA_sample_size = 2;
+float roughness = 0.0f;
 
 #define MAX_DEPTH 4  //number of bounces
 
@@ -80,13 +81,10 @@ Scene* scene = NULL;
 
 Grid* grid_ptr = NULL;
 BVH* bvh_ptr = NULL;
-accelerator Accel_Struct = BVH_ACC; // CHANGE ACCELERATOR TYPE HERE. THE RANDOM SCENCE USES BVH BY DEFAULT.
 
 int RES_X, RES_Y;
 
 int WindowHandle = 0;
-
-int AA_sample_size = 2;
 
 /////////////////////////////////////////////////////////////////////// ERRORS
 
@@ -528,8 +526,8 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		for (int i = 0; i < num_lights; i++) {
 			Light* light = scene->getLight(i);
 			
-			// SOFT SHADOWING WITH ANTIALIASING
-			if (soft_shadows_with_aliasing){
+			// ANTIALIASING
+			if (antialiasing) {
 				Vector light_dir = (light->position - biased_hp).normalize();
 
 				// Define the parallelogram of the light with two orthogonal vectors
@@ -543,7 +541,11 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 				Vector corner_point = light->position - a - b;
 
 				// Choose a random point from the parallelogram
-				Vector perturbed_light_pos = corner_point + a * rand_float() * 2 + b * rand_float() * 2;
+				Vector perturbed_light_pos;
+
+				if (soft_shadows) perturbed_light_pos = corner_point + a * rand_float() * 2 + b * rand_float() * 2;
+				else perturbed_light_pos = light->position;
+
 				Vector perturbed_light_dir = (perturbed_light_pos - biased_hp).normalize();
 
 				if (perturbed_light_dir * normal > 0) {
@@ -577,7 +579,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 					}
 
 					if (vis) {
-						Vector halfway = (perturbed_light_dir + biased_dir_to_orig).normalize(); // use halfway vector, instead of computing the reflection dir
+						Vector halfway = (perturbed_light_dir + biased_dir_to_orig).normalize(); // halfway vector because computing the reflected dir is costly
 
 						color += light->color * closest_obj->GetMaterial()->GetDiffColor() * closest_obj->GetMaterial()->GetDiffuse() *
 							max(perturbed_light_dir * normal, 0.0f); // diffuse component
@@ -587,12 +589,19 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 					}
 				}
 			}
-			// SOFT SHADOWING WITHOUT ANTIALIASING
+			// NO ANTIALIASING
 			else {
 				int num_lights_per_light = 9;
+				if (!soft_shadows) num_lights_per_light = 1;
+
 				for (int j = 0; j < num_lights_per_light; j++) {
-	 				Vector perturbed_light_pos = light->position + Vector(rand_float() - 0.5, rand_float() - 0.5, rand_float() - 0.5);
-	 				Vector perturbed_light_dir = (perturbed_light_pos - biased_hp).normalize();
+					Vector perturbed_light_pos;
+
+					if (soft_shadows) perturbed_light_pos = light->position + Vector(rand_float() - 0.5, rand_float() - 0.5, rand_float() - 0.5);
+					else perturbed_light_pos = light->position;
+
+					Vector perturbed_light_dir = (perturbed_light_pos - biased_hp).normalize();
+
 
 	 				if (perturbed_light_dir * normal > 0) {
 						bool vis = true;
@@ -625,7 +634,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 						}
 
 						if (vis) {
-							Vector halfway = (perturbed_light_dir + biased_dir_to_orig).normalize(); // use halfway vector, instead of computing the reflection dir
+							Vector halfway = (perturbed_light_dir + biased_dir_to_orig).normalize(); // halfway vector because computing the reflected dir is costly
 
 							color += light->color * closest_obj->GetMaterial()->GetDiffColor() * closest_obj->GetMaterial()->GetDiffuse() *
 								max(perturbed_light_dir * normal, 0.0f) * (1.0f / num_lights_per_light); // diffuse component
@@ -653,7 +662,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		Vector v = ray.direction * (-1);
 		Vector refl_dir = (normal * (v * normal) * 2 - v).normalize();
 		
-		Vector fuzzy_direction = (refl_dir + rnd_unit_sphere() * ROUGHNESS).normalize();
+		Vector fuzzy_direction = (refl_dir + rnd_unit_sphere() * roughness).normalize();
 
 		Color refl_color;
 		if (fuzzy_direction * normal > 0) { // otherwise, there will be no reflection
@@ -718,23 +727,34 @@ void renderScene()
 
 			Vector pixel;  //viewport coordinates
 			Vector lens_sample;
-			
-			for (int p = 0; p < AA_sample_size; p++) {
-				for (int q = 0; q < AA_sample_size; q++) {
 
-					pixel.x = x + (p + (0.5f + rand_float()) / AA_sample_size);
-					pixel.y = y + (q + (0.5f + rand_float()) / AA_sample_size);
+			if (antialiasing) {
+				for (int p = 0; p < AA_sample_size; p++) {
+					for (int q = 0; q < AA_sample_size; q++) {
 
-					lens_sample = rnd_unit_disk() * scene->GetCamera()->GetAperture(); // random coords in unit disc
+							pixel.x = x + (p + (0.5f + rand_float()) / AA_sample_size);
+							pixel.y = y + (q + (0.5f + rand_float()) / AA_sample_size);
 
-					Ray ray = scene->GetCamera()->PrimaryRay(lens_sample, pixel);   //function from camera.h
+						lens_sample = rnd_unit_disk() * scene->GetCamera()->GetAperture(); // random coords in unit disc
 
-					color += rayTracing(ray, 1, 1.0).clamp();
+						Ray ray = scene->GetCamera()->PrimaryRay(lens_sample, pixel);   //function from camera.h
+
+						color += rayTracing(ray, 1, 1.0).clamp();
+					}
 				}
-			}
 
-			color = color * (1.0 / (AA_sample_size * AA_sample_size));
-			
+				color = color * (1.0 / (AA_sample_size * AA_sample_size));
+			}
+			else {
+				pixel.x = x + 0.5f;
+				pixel.y = y + 0.5f;
+
+				lens_sample = rnd_unit_disk() * scene->GetCamera()->GetAperture(); // random coords in unit disc
+
+				Ray ray = scene->GetCamera()->PrimaryRay(lens_sample, pixel);   //function from camera.h
+
+				color += rayTracing(ray, 1, 1.0).clamp();
+			}
 
 			img_Data[counter++] = u8fromfloat((float)color.r());
 			img_Data[counter++] = u8fromfloat((float)color.g());
@@ -845,7 +865,7 @@ void init_scene(void)
 	img_Data = (uint8_t*)malloc(3 * RES_X*RES_Y * sizeof(uint8_t));
 	if (img_Data == NULL) exit(1);
 
-	if (Accel_Struct == GRID_ACC) {
+	if (scene->GetAccelStruct() == GRID_ACC) {
 		grid_ptr = new Grid();
 		vector<Object*> objs;
 		int num_objects = scene->getNumObjects();
@@ -857,7 +877,7 @@ void init_scene(void)
 		grid_ptr->Build(objs);
 		printf("Grid built.\n\n");
 	}
-	else if (Accel_Struct == BVH_ACC) {
+	else if (scene->GetAccelStruct() == BVH_ACC) {
 		bvh_ptr = new BVH();
 		vector<Object*> objs;
 		int num_objects = scene->getNumObjects();
