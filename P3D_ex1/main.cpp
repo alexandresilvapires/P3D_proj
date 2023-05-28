@@ -29,9 +29,9 @@ bool drawModeEnabled = false;
 
 bool P3F_scene = true; //choose between P3F scene or a built-in random scene
 
+bool soft_shadows = true;
 bool soft_shadows_with_aliasing = true;
-
-float ROUGHNESS = 0.0f;
+int AA_sample_size = 2;
 
 #define MAX_DEPTH 4  //number of bounces
 
@@ -80,13 +80,11 @@ Scene* scene = NULL;
 
 Grid* grid_ptr = NULL;
 BVH* bvh_ptr = NULL;
-accelerator Accel_Struct = BVH_ACC; // CHANGE ACCELERATOR TYPE HERE. THE RANDOM SCENCE USES BVH BY DEFAULT.
+accelerator Accel_Struct = GRID_ACC; // CHANGE ACCELERATOR TYPE HERE. THE RANDOM SCENCE USES BVH BY DEFAULT.
 
 int RES_X, RES_Y;
 
 int WindowHandle = 0;
-
-int AA_sample_size = 2;
 
 /////////////////////////////////////////////////////////////////////// ERRORS
 
@@ -543,7 +541,11 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 				Vector corner_point = light->position - a - b;
 
 				// Choose a random point from the parallelogram
-				Vector perturbed_light_pos = corner_point + a * rand_float() * 2 + b * rand_float() * 2;
+				Vector perturbed_light_pos;
+
+				if (soft_shadows) perturbed_light_pos = corner_point + a * rand_float() * 2 + b * rand_float() * 2;
+				else perturbed_light_pos = light->position;
+
 				Vector perturbed_light_dir = (perturbed_light_pos - biased_hp).normalize();
 
 				if (perturbed_light_dir * normal > 0) {
@@ -577,7 +579,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 					}
 
 					if (vis) {
-						Vector halfway = (perturbed_light_dir + biased_dir_to_orig).normalize(); // use halfway vector, instead of computing the reflection dir
+						Vector halfway = (perturbed_light_dir + biased_dir_to_orig).normalize(); // l_dir + dir from biased_hp to ray origin
 
 						color += light->color * closest_obj->GetMaterial()->GetDiffColor() * closest_obj->GetMaterial()->GetDiffuse() *
 							max(perturbed_light_dir * normal, 0.0f); // diffuse component
@@ -590,9 +592,16 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 			// SOFT SHADOWING WITHOUT ANTIALIASING
 			else {
 				int num_lights_per_light = 9;
+				if (!soft_shadows) num_lights_per_light = 1;
+
 				for (int j = 0; j < num_lights_per_light; j++) {
-	 				Vector perturbed_light_pos = light->position + Vector(rand_float() - 0.5, rand_float() - 0.5, rand_float() - 0.5);
-	 				Vector perturbed_light_dir = (perturbed_light_pos - biased_hp).normalize();
+					Vector perturbed_light_pos;
+
+					if (soft_shadows) perturbed_light_pos = light->position + Vector(rand_float() - 0.5, rand_float() - 0.5, rand_float() - 0.5);
+					else perturbed_light_pos = light->position;
+
+					Vector perturbed_light_dir = (perturbed_light_pos - biased_hp).normalize();
+
 
 	 				if (perturbed_light_dir * normal > 0) {
 						bool vis = true;
@@ -625,7 +634,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 						}
 
 						if (vis) {
-							Vector halfway = (perturbed_light_dir + biased_dir_to_orig).normalize(); // use halfway vector, instead of computing the reflection dir
+							Vector halfway = (perturbed_light_dir + biased_dir_to_orig).normalize(); // l_dir + dir from biased_hp to ray origin
 
 							color += light->color * closest_obj->GetMaterial()->GetDiffColor() * closest_obj->GetMaterial()->GetDiffuse() *
 								max(perturbed_light_dir * normal, 0.0f) * (1.0f / num_lights_per_light); // diffuse component
@@ -654,7 +663,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		Vector refl_dir = (normal * (v * normal) * 2 - v).normalize();
 		
 		// !! roughness parameter for each object
-		Vector fuzzy_direction = (refl_dir + rnd_unit_sphere() * ROUGHNESS).normalize();
+		Vector fuzzy_direction = (refl_dir + rnd_unit_sphere() * 0.0f).normalize();
 
 		Color refl_color;
 		if (fuzzy_direction * normal > 0) { // otherwise, there will be no reflection
