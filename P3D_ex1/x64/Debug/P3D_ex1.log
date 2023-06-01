@@ -1,2 +1,18 @@
-﻿  P3D_ex1.vcxproj -> C:\Users\jfons\Documents\P3D_proj\x64\Debug\P3D_ex1.exe
+﻿  main.cpp
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\maths.h(69,23): warning C4244: 'return' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\camera.h(75,18): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\camera.h(76,18): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\camera.h(88,18): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\camera.h(89,18): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\color.h(42,14): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\color.h(41,14): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\color.h(40,28): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\main.cpp(459,11): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\main.cpp(472,12): warning C4244: 'return' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\main.cpp(600,124): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\main.cpp(600,104): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\main.cpp(600,84): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\main.cpp(715,27): warning C4244: 'argument' : conversion de 'time_t' en 'const int', perte possible de données
+C:\Users\jfons\Documents\P3D_proj\P3D_ex1\main.cpp(746,26): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+  P3D_ex1.vcxproj -> C:\Users\jfons\Documents\P3D_proj\x64\Debug\P3D_ex1.exe
   0 File(s) copied

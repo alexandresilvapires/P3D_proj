@@ -31,7 +31,7 @@ bool P3F_scene = true; //choose between P3F scene or a built-in random scene
 
 bool soft_shadows = true;
 bool antialiasing = true;
-int AA_sample_size = 2;
+int AA_sample_size = 4;
 float roughness = 0.0f;
 
 #define MAX_DEPTH 4  //number of bounces
