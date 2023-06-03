@@ -5,6 +5,15 @@
 			"guid": "00000000000000000000000000000000",
 			"description": "Default Uncontrolled Changelist",
 			"files": [
+				"U:/P3D/P3D_proj/UE5/Content/Maps/HouseMap.umap",
+				"U:/P3D/P3D_proj/UE5/Content/Materials/LandscapeMaterial.uasset",
+				"U:/P3D/P3D_proj/UE5/Content/Maps/HouseMap_sharedassets/Grass_LayerInfo.uasset",
+				"U:/P3D/P3D_proj/UE5/Content/StarterContent/Materials/M_Water_Lake.uasset",
+				"U:/P3D/P3D_proj/UE5/Content/StarterContent/Materials/M_Water_Ocean.uasset",
+				"U:/P3D/P3D_proj/UE5/Content/Maps/HouseMap_sharedassets/Rock_LayerInfo.uasset",
+				"U:/P3D/P3D_proj/UE5/Content/Maps/HouseMap_sharedassets/Sand_LayerInfo.uasset",
+				"U:/Program Files/UE_5.2/Engine/Plugins/Experimental/Water/Content/Materials/WaterSurface/Water_Material_Lake.uasset",
+				"U:/P3D/P3D_proj/UE5/Content/Materials/Stylizedgrass/StylizedGrass.uasset",
 				"C:/Users/jfons/Documents/Unreal Projects/House2/Content/StarterContent/Architecture/Floor_400x400.uasset",
 				"C:/Users/jfons/Documents/P3D_proj/UE5/Content/Maps/HouseMap.umap"
 			]
