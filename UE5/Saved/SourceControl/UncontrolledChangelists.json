@@ -5,6 +5,8 @@
 			"guid": "00000000000000000000000000000000",
 			"description": "Default Uncontrolled Changelist",
 			"files": [
+				"C:/Users/alexa/Desktop/P3D_proj/UE5/Content/FirstPerson/Blueprints/BP_FirstPersonCharacter.uasset",
+				"C:/Users/alexa/Desktop/P3D_proj/UE5/Content/Maps/HouseMap.umap",
 				"U:/P3D/P3D_proj/UE5/Content/Maps/HouseMap.umap",
 				"U:/P3D/P3D_proj/UE5/Content/Materials/LandscapeMaterial.uasset",
 				"U:/P3D/P3D_proj/UE5/Content/Maps/HouseMap_sharedassets/Grass_LayerInfo.uasset",
