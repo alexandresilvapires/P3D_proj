@@ -1,0 +1,6 @@
+2023/06/06-15:18:19.228 2304 Creating DB C:/Users/jfons/Documents/P3D_proj/UE5/Saved/webcache_4430\IndexedDB\https_www.youtube-nocookie.com_0.indexeddb.leveldb since it was missing.
+2023/06/06-15:18:19.247 2304 Reusing MANIFEST C:/Users/jfons/Documents/P3D_proj/UE5/Saved/webcache_4430\IndexedDB\https_www.youtube-nocookie.com_0.indexeddb.leveldb/MANIFEST-000001
+2023/06/06-15:20:31.108 1cdc Level-0 table #5: started
+2023/06/06-15:20:31.123 1cdc Level-0 table #5: 1167 bytes OK
+2023/06/06-15:20:31.124 1cdc Delete type=0 #3
+2023/06/06-15:20:31.126 1cdc Manual compaction at level-0 from (begin) .. (end); will stop at (end)
