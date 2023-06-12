@@ -1,0 +1,14 @@
+{
+	"Targets": [
+		{
+			"Name": "House2",
+			"Path": "/Users/diogofouto/Documents/MEIC-A/P4/P3D/Labs/Assignment 1/P3D_proj/UE5/Source/House2.Target.cs",
+			"Type": "Game"
+		},
+		{
+			"Name": "House2Editor",
+			"Path": "/Users/diogofouto/Documents/MEIC-A/P4/P3D/Labs/Assignment 1/P3D_proj/UE5/Source/House2Editor.Target.cs",
+			"Type": "Editor"
+		}
+	]
+}

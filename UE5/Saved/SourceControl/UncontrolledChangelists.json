@@ -5,6 +5,13 @@
 			"guid": "00000000000000000000000000000000",
 			"description": "Default Uncontrolled Changelist",
 			"files": [
+				"/Users/diogofouto/Documents/MEIC-A/P4/P3D/Labs/Assignment 1/P3D_proj/UE5/Content/Maps/HouseMap_BuiltData.uasset",
+				"/Users/diogofouto/Documents/MEIC-A/P4/P3D/Labs/Assignment 1/P3D_proj/UE5/Content/Maps/HouseMap.umap",
+				"/Users/diogofouto/Documents/MEIC-A/P4/P3D/Labs/Assignment 1/P3D_proj/UE5/Content/Materials/LandscapeMaterial.uasset",
+				"/Users/diogofouto/Documents/MEIC-A/P4/P3D/Labs/Assignment 1/P3D_proj/UE5/Content/PN_OpenWorldFoliage/Materials/MA_OpenWorldFoliage.uasset",
+				"/Users/diogofouto/Documents/MEIC-A/P4/P3D/Labs/Assignment 1/P3D_proj/UE5/Content/Props/Material_48.uasset",
+				"/Users/diogofouto/Documents/MEIC-A/P4/P3D/Labs/Assignment 1/P3D_proj/UE5/Content/Props/Metal_M.uasset",
+				"/Users/diogofouto/Documents/MEIC-A/P4/P3D/Labs/Assignment 1/P3D_proj/UE5/Content/PN_OpenWorldFoliage/Materials/MI_OpenWorldFoliage.uasset",
 				"U:/P3D/P3D_proj/UE5/Content/Maps/HouseMap.umap",
 				"U:/P3D/P3D_proj/UE5/Content/Materials/LandscapeMaterial.uasset",
 				"U:/P3D/P3D_proj/UE5/Content/Maps/HouseMap_sharedassets/Grass_LayerInfo.uasset",
