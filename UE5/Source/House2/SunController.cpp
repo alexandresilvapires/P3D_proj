@@ -10,15 +10,15 @@
 
 UNiagaraComponent* ASunController::FindFireflyNiagaraComponent()
 {
-    // Find all actors in the current level
+    // Find all actors
     TArray<AActor*> FoundActors;
     UGameplayStatics::GetAllActorsOfClass(GetWorld(), ANiagaraActor::StaticClass(), FoundActors);
 
-    // Iterate through the found actors and check for a Niagara component
+    // Check for a Niagara component
     for (AActor* FoundActor : FoundActors)
     {
         ANiagaraActor* NiagaraActor = Cast<ANiagaraActor>(FoundActor);
-        if (NiagaraActor && NiagaraActor->GetName() == TEXT("NS_Firefly"))
+        if (FoundActor->GetName() == TEXT("NS_Firefly"))
         {
             UNiagaraComponent* NiagaraComponent = NiagaraActor->GetNiagaraComponent();
             if (NiagaraComponent)
@@ -28,11 +28,10 @@ UNiagaraComponent* ASunController::FindFireflyNiagaraComponent()
         }
     }
 
-    // Return nullptr if the component was not found
+    // if component was not found
     return nullptr;
 }
 
-// Enable fog in the scene
 void ASunController::EnableFog()
 {
     UExponentialHeightFogComponent* FogComponent = GetWorld()->GetFirstPlayerController()->FindComponentByClass<UExponentialHeightFogComponent>();
@@ -42,7 +41,6 @@ void ASunController::EnableFog()
     }
 }
 
-// Disable fog in the scene
 void ASunController::DisableFog()
 {
     UExponentialHeightFogComponent* FogComponent = GetWorld()->GetFirstPlayerController()->FindComponentByClass<UExponentialHeightFogComponent>();
@@ -52,7 +50,6 @@ void ASunController::DisableFog()
     }
 }
 
-// Enable fireflies in the scene
 void ASunController::EnableFireflies()
 {
     UNiagaraComponent* FireflyComponent = FindFireflyNiagaraComponent();
@@ -63,7 +60,6 @@ void ASunController::EnableFireflies()
     }
 }
 
-// Disable fireflies in the scene
 void ASunController::DisableFireflies()
 {
     UNiagaraComponent* FireflyComponent = FindFireflyNiagaraComponent();
@@ -98,7 +94,7 @@ void ASunController::OnSunPosition1()
     UDirectionalLightComponent* DirectionalLight = UGameplayStatics::GetActorOfClass(GetWorld(), UDirectionalLightComponent::StaticClass());
     if (DirectionalLight)
     {
-        // Set the morning sun position for "J" key press (e.g., 10 AM)
+        // morning
         DirectionalLight->SetWorldRotation(FRotator(30.0f, 0.0f, 0.0f));
     }
     
@@ -111,7 +107,7 @@ void ASunController::OnSunPosition2()
     UDirectionalLightComponent* DirectionalLight = UGameplayStatics::GetActorOfClass(GetWorld(), UDirectionalLightComponent::StaticClass());
     if (DirectionalLight)
     {
-        // Set the afternoon sun position for "k" key press (e.g., 5 PM)
+        // afternoon
         DirectionalLight->SetWorldRotation(FRotator(60.0f, 0.0f, 0.0f));
     }
     
@@ -125,7 +121,7 @@ void ASunController::OnSunPosition3()
     UDirectionalLightComponent* DirectionalLight = UGameplayStatics::GetActorOfClass(GetWorld(), UDirectionalLightComponent::StaticClass());
     if (DirectionalLight)
     {
-        // Set the night sun position for "L" key press (e.g., 11 PM)
+        // night
         DirectionalLight->SetWorldRotation(FRotator(90.0f, 0.0f, 0.0f));
     }
     

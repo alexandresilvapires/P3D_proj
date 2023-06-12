@@ -1,0 +1,62 @@
+{
+  "buildCommand" : {
+    "command" : "prepareForIndexing",
+    "enableIndexBuildArena" : false,
+    "targets" : null
+  },
+  "configuredTargets" : [
+    {
+      "guid" : "65f3fec58c246a2b4ff8c6f07d36882e82aea14bddeff56d2507041cfb707e15"
+    },
+    {
+      "guid" : "65f3fec58c246a2b4ff8c6f07d36882edbd1df04136badd96e3ba29f28b0af4b"
+    },
+    {
+      "guid" : "65f3fec58c246a2b4ff8c6f07d36882e3f604cacac01b027b430cd09d44b1bfb"
+    }
+  ],
+  "containerPath" : "/Users/diogofouto/Documents/MEIC-A/P4/P3D/Labs/Assignment 1/P3D_proj/UE5/House2.xcworkspace",
+  "continueBuildingAfterErrors" : true,
+  "enableIndexBuildArena" : false,
+  "hideShellScriptEnvironment" : false,
+  "parameters" : {
+    "action" : "build",
+    "activeArchitecture" : "arm64",
+    "activeRunDestination" : {
+      "disableOnlyActiveArch" : false,
+      "platform" : "macosx",
+      "sdk" : "macosx13.3",
+      "sdkVariant" : "macos",
+      "supportedArchitectures" : [
+        "arm64e",
+        "arm64",
+        "x86_64"
+      ],
+      "targetArchitecture" : "arm64"
+    },
+    "arenaInfo" : {
+      "buildIntermediatesPath" : "",
+      "buildProductsPath" : "",
+      "derivedDataPath" : "/Users/diogofouto/Library/Developer/Xcode/DerivedData",
+      "indexDataStoreFolderPath" : "/Users/diogofouto/Library/Developer/Xcode/DerivedData/House2-fprscnbcfvpgtngrhvsrgdsakdvf/Index.noindex/DataStore",
+      "indexEnableDataStore" : true,
+      "indexPCHPath" : "/Users/diogofouto/Library/Developer/Xcode/DerivedData/House2-fprscnbcfvpgtngrhvsrgdsakdvf/Index.noindex/PrecompiledHeaders",
+      "pchPath" : ""
+    },
+    "configurationName" : "Development Editor",
+    "overrides" : {
+      "synthesized" : {
+        "table" : {
+          "ENABLE_PREVIEWS" : "NO"
+        }
+      }
+    }
+  },
+  "qos" : "default",
+  "schemeCommand" : "launch",
+  "showNonLoggedProgress" : true,
+  "useDryRun" : true,
+  "useImplicitDependencies" : true,
+  "useLegacyBuildLocations" : false,
+  "useParallelTargets" : true
+}

@@ -1,0 +1,5 @@
+Target dependency graph (3 targets)
+House2_Build in House2, no dependencies
+House2 in House2, depends on:
+House2_Build in House2 (explicit)
+House2_Index in House2, no dependencies
