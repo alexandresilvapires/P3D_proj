@@ -19,5 +19,9 @@
 			"Name": "Volumetrics",
 			"Enabled": true
 		}
+	],
+	"TargetPlatforms": [
+		"Mac",
+		"Windows"
 	]
 }
