@@ -1,0 +1,13 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "u:\\p3d\\p3d_proj\\ue5\\intermediate\\source\\house2.cpp",
+        "ProvidedModule": "",
+        "PCH": "u:\\p3d\\p3d_proj\\ue5\\intermediate\\build\\win64\\x64\\house2\\development\\core\\sharedpch.core.shadowerrors.inclorderunreal5_0.h.pch",
+        "Includes": [
+            "u:\\p3d\\p3d_proj\\ue5\\intermediate\\build\\win64\\x64\\unrealgame\\development\\house2\\definitions.house2.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}
